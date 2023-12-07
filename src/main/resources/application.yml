@@ -1,0 +1,108 @@
+server:
+  port: 80
+# ===========================================================================
+# 日志输出debug级别（包括sql语句
+# ===========================================================================
+logging:
+  level:
+    com:
+      company:
+        cache: debug
+spring:
+# ===========================================================================
+# MySql数据源
+# ===========================================================================
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/graduation_design
+    username: root
+    password: root
+## ===========================================================================
+## 关键key取值
+## ===========================================================================
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: 8af1ccba09c2cfda8c81
+            client-secret: 6373298b26f5e219e357b55d5efa59d695194703
+# ===========================================================================
+# ????????
+# ===========================================================================
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+mybatis:
+  typeAliasesPackage: com.zhku.ayelsh.web_kali_liunx.file.pojo.ExcelEntity
+  mapperLocations: classpath:mybatis/mapper/*.xml
+## ===========================================================================
+## 日期格式
+## ===========================================================================
+jackson:
+  date-format: yyyy-MM-dd HH:mm:ss
+  time-zone: GMT+8
+# ===========================================================================
+# Redis
+# ===========================================================================
+#  redis:
+#    database: 0
+#    host: 172.19.237.43
+#    port: 6379
+#    password:
+#    jedis:
+#      pool:
+#        max-active: 8
+#        max-wait: -1
+#        max-idle: 8
+#        min-idle: 0
+#    timeout: 0
+## ===========================================================================
+## security
+## ===========================================================================
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          jwk-set-uri: ${auth-server}/getPublicKey
+#
+#auth-server: http://localhost:8080
+#
+#security:
+#  oauth2:
+#    client:
+#      client-id: client
+#      client-secret: secret
+#      access-token-uri:  ${auth-server}/oauth/token
+#      user-authorization-uri:  ${auth-server}/oauth/authorize
+#    resource:
+#      token-info-uri:  ${auth-server}/oauth/check_token
+#      user-info-uri: ${auth-server}/me
+#    sso:
+#      login-path: /login
+
+#        provider:
+#          github:
+#            authorization-uri: https://github.com/login/oauth/authorize
+#            token-uri: https://github.com/login/oauth/access_token
+#            user-info-uri: https://api.github.com/user
+
+#            redirect-uri: http://localhost:80/oauth_github/redirect
+#            user-name-attribute: sub
+#            jwk-set-uri: https://your-subdomain.oktapreview.com/oauth2/v1/keys
+#
+#
+#
+#          gitee:
+#            clientId: 0856e484e49672ca066cb1aee4ab3c98285af16bba0fef87a5570694e547a16d
+#            clientSecret: 32ffc09a3347fcca221625b44f735b6837766240cbfc978aa882cd8c74ed2ed1
+#            authorizeUrl: https://gitee.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code
+#            redirectUrl : http://localhost:80/oauth_gitee/redirect
+#            accessTokenUrl: https://gitee.com/oauth/token?grant_type=authorization_code
+#            userInfoUrl: https://api.github.com/user
+
+
+
+
+
