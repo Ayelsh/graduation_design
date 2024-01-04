@@ -36,6 +36,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("查无该用户,请重试");
         }
 
-        return new LoginUser(user);
+        return new LoginUser(user,"");
     }
 }

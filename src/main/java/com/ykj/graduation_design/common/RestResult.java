@@ -1,15 +1,21 @@
 package com.ykj.graduation_design.common;
 
 
+import com.alibaba.fastjson2.JSON;
+import jakarta.servlet.ServletResponse;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
 @Getter
 @Generated
 @ToString
+@Slf4j
 public class RestResult<T> {
     private final Integer code;
     private final String msg;
@@ -23,6 +29,28 @@ public class RestResult<T> {
         this.code = code;
         this.msg = msg;
         this.data = data;
+    }
+    /**
+     * Response输出Json格式
+     *
+     * @param response
+     * @param data     返回数据
+     */
+    public static void responseJson(ServletResponse response, Object data) {
+        PrintWriter out = null;
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            out = response.getWriter();
+            out.println(JSON.toJSONString(data));
+            out.flush();
+        } catch (Exception e) {
+            log.error("Response输出Json异常：" + e);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
 
     public RestResult(Integer code, String msg) {

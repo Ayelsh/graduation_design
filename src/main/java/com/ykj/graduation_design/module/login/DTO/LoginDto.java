@@ -1,5 +1,6 @@
 package com.ykj.graduation_design.module.login.DTO;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -11,6 +12,8 @@ import lombok.Data;
  */
 @Data
 public class LoginDto {
+    @NotBlank(message = "用户名不得为空")
     private String userName;
+    @NotBlank(message = "密码不得为空")
     private String password;
 }

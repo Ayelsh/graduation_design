@@ -8,6 +8,22 @@ logging:
     com:
       company:
         cache: debug
+# ===========================================================================
+# JWT配置
+# ===========================================================================
+jwt:
+  # 密匙Key
+  secret: JWTSecret_Ayelsh
+  # HeaderKey
+  tokenHeader: Authorization
+  # Token前缀
+  tokenPrefix: Bearer
+  # 过期时间，单位秒
+  expiration: 300
+  # 刷新时间，单位天
+  refreshTime: 7
+  # 配置白名单（不需要认证）
+  antMatchers: /login/**,/register/**,/static/**
 spring:
 # ===========================================================================
 # MySql数据源
@@ -28,12 +44,22 @@ spring:
             client-id: 8af1ccba09c2cfda8c81
             client-secret: 6373298b26f5e219e357b55d5efa59d695194703
 # ===========================================================================
+# Redis
+# ===========================================================================
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      timeout: 5000
+# ===========================================================================
 # ????????
 # ===========================================================================
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+
 mybatis:
   typeAliasesPackage: com.zhku.ayelsh.web_kali_liunx.file.pojo.ExcelEntity
   mapperLocations: classpath:mybatis/mapper/*.xml
@@ -43,21 +69,6 @@ mybatis:
 jackson:
   date-format: yyyy-MM-dd HH:mm:ss
   time-zone: GMT+8
-# ===========================================================================
-# Redis
-# ===========================================================================
-#  redis:
-#    database: 0
-#    host: 172.19.237.43
-#    port: 6379
-#    password:
-#    jedis:
-#      pool:
-#        max-active: 8
-#        max-wait: -1
-#        max-idle: 8
-#        min-idle: 0
-#    timeout: 0
 ## ===========================================================================
 ## security
 ## ===========================================================================

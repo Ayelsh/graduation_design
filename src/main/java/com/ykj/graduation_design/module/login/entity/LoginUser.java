@@ -25,6 +25,8 @@ public class LoginUser implements UserDetails {
 
     private User user;
 
+    private String ip;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -40,6 +42,16 @@ public class LoginUser implements UserDetails {
     public String getUsername() {
         log.info(user.getUserName());
         return user.getUserName();
+    }
+
+    public void setUsername(String userName) {
+        log.info("username: {} -> {}",user.getUserName(),userName);
+        user.setUserName(userName);
+    }
+
+    public void setId(Long id) {
+        log.info("userId: {} -> {}",user.getId(),id);
+        user.setId(id);
     }
 
     @Override
