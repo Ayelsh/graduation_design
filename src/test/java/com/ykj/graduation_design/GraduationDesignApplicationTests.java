@@ -1,6 +1,13 @@
 package com.ykj.graduation_design;
 
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import com.ykj.graduation_design.common.EnvironmentProperty;
+import com.ykj.graduation_design.module.liunxConect.pojo.SSHConnectInfo;
+import com.ykj.graduation_design.module.liunxConect.pojo.WebSSHData;
+import com.ykj.graduation_design.module.liunxConect.services.WebSSHService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -12,59 +19,81 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 @SpringBootTest
 @Slf4j
 class GraduationDesignApplicationTests {
 
+
     @Test
-    void contextLoads() throws URISyntaxException, IOException {
-        // 创建Httpclient对象
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+    public void connect() throws JSchException, IOException {
 
-        URI uri = new URI(URLEncoder.encode("https://github.com/login/oauth/access_token"));
-        // 添加信息
-        HttpPost httpPost = new HttpPost(uri);
+        WebSSHData webSSHData = new WebSSHData("connext","","192.168.31.153",20,"Ayelsh","962464");
 
-        // 设置2个post参数，一个是scope、一个是q
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("client_id", EnvironmentProperty.getProperty("client_id")));
-        params.add(new BasicNameValuePair("client_secret", EnvironmentProperty.getProperty("client_secret")));
-        params.add(new BasicNameValuePair("code", "ec68fd91c01b53a1e413"));
-        // 构造一个form表单式的实体
-        UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(params);
-        // 将请求实体设置到httpPost对象中
-        httpPost.setEntity(formEntity);
-        CloseableHttpResponse response = null;
-        try
-        {
-            // 执行请求
-            response = httpclient.execute(httpPost);
-            // 判断返回状态是否为200
-            if (response.getCode() == 200)
-            {
-                String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-                System.out.println(content);
+        JSch jSch = new JSch();
+        SSHConnectInfo sshConnectInfo = new SSHConnectInfo();
+        sshConnectInfo.setjSch(jSch);
+
+        Session session = null;
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        //获取jsch的会话
+        session = sshConnectInfo.getjSch().getSession(webSSHData.getUsername(), webSSHData.getHost(), webSSHData.getPort());
+        session.setConfig(config);
+        //设置密码
+        session.setPassword(webSSHData.getPassword());
+        //连接  超时时间30s
+        session.connect(30000);
+
+        //开启shell通道
+        Channel channel = session.openChannel("shell");
+
+        //通道连接 超时时间3s
+        channel.connect(3000);
+
+        //设置channel
+        sshConnectInfo.setChannel(channel);
+
+        //转发消息
+        OutputStream outputStream = channel.getOutputStream();
+        outputStream.write("\r".getBytes());
+        outputStream.flush();
+
+
+
+        //读取终端返回的信息流
+        InputStream inputStream = channel.getInputStream();
+        try {
+            //循环读取
+            byte[] buffer = new byte[1024];
+            int i = 0;
+            //如果没有数据来，线程会一直阻塞在这个地方等待数据。
+            while ((i = inputStream.read(buffer)) != -1) {
+                log.info(Arrays.toString(Arrays.copyOfRange(buffer, 0, i)));
+//                sendMessage(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
             }
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } finally
-        {
-            if (response != null)
-            {
-                response.close();
+
+        } finally {
+            //断开连接后关闭会话
+            session.disconnect();
+            channel.disconnect();
+            if (inputStream != null) {
+                inputStream.close();
             }
-            httpclient.close();
         }
-
     }
 
 }

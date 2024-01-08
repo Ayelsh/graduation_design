@@ -11,7 +11,9 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -52,8 +54,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Resource
-//    JwtFilter jwtFilter;//后面jwt验证需要用到的过滤器，现在先不理它
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -78,8 +78,20 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated())
                 //将用户授权时用到的JWT校验过滤器添加进SecurityFilterChain中，并放在UsernamePasswordAuthenticationFilter的前面
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login();
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//                .oauth2Login();
         return httpSecurity.build();
+    }
+
+    /**
+     * websocket请求?似乎并没有用
+     *
+     * @return
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers("/webssh/**");
+
     }
 
 

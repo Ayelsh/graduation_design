@@ -26,6 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
+        log.info("进入token拦截器");
         //从请求头中获取token
         String token = request.getHeader("token");
 
@@ -60,6 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         response.setHeader(JWTConfig.tokenHeader, newToke);
 
                         log.info("用户{}的Token已过期，但未超过刷新时间，已刷新", username);
+
 
                         token = newToke;
 

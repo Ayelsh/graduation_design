@@ -32,6 +32,7 @@ public class LoginUser implements UserDetails {
         return null;
     }
 
+
     @Override
     public String getPassword() {
         log.info(user.getPassword());

@@ -5,7 +5,6 @@ import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.entity.User;
 import com.ykj.graduation_design.common.utils.AccessAddressUtils;
 import com.ykj.graduation_design.common.utils.JWTTokenUtils;
-import com.ykj.graduation_design.common.utils.JwtUtil;
 import com.ykj.graduation_design.config.JWTConfig;
 import com.ykj.graduation_design.module.login.DTO.LoginDto;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
@@ -15,8 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,8 +43,6 @@ public class UserController {
     @PostMapping("login")
     public void doLogin(@Validated @RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
         try {
-
-
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(loginDto.getUserName(), loginDto.getPassword());
             Authentication authentication = authenticationManager.authenticate(auth);
@@ -85,7 +80,7 @@ public class UserController {
                     throw new Exception("用户名已存在");
                 }
 
-                String jwtToken = JwtUtil.getToken(new LoginUser(user, AccessAddressUtils.getIpAddress(request)));
+//                String jwtToken = JwtUtil.getToken(new LoginUser(user, AccessAddressUtils.getIpAddress(request)));
                 RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
             } else
                 throw new Exception("密码为空");
