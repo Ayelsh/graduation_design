@@ -50,6 +50,7 @@ public class UserController {
 
             String ip = AccessAddressUtils.getIpAddress(request);
             LoginUser userDetails = (LoginUser) authentication.getPrincipal();
+            log.info("登录IP：{}",ip);
             userDetails.setIp(ip);
             String jwtToken = JWTTokenUtils.createAccessToken(userDetails);
 

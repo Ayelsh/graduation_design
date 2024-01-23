@@ -35,23 +35,19 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        log.info(user.getPassword());
         return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        log.info(user.getUserName());
         return user.getUserName();
     }
 
     public void setUsername(String userName) {
-        log.info("username: {} -> {}",user.getUserName(),userName);
         user.setUserName(userName);
     }
 
     public void setId(Long id) {
-        log.info("userId: {} -> {}",user.getId(),id);
         user.setId(id);
     }
 

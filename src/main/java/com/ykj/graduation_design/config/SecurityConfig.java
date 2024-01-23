@@ -1,6 +1,7 @@
 package com.ykj.graduation_design.config;
 
 import com.ykj.graduation_design.Filter.JwtFilter;
+import com.ykj.graduation_design.Filter.RequestReplaceFilter;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,9 @@ public class SecurityConfig {
 
     @Resource
     JwtFilter jwtFilter;
+
+    @Resource
+    RequestReplaceFilter requestReplaceFilter;
 
     /**
      * 查询默认使用loadUserByUsername
@@ -78,21 +82,22 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated())
                 //将用户授权时用到的JWT校验过滤器添加进SecurityFilterChain中，并放在UsernamePasswordAuthenticationFilter的前面
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(requestReplaceFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, RequestReplaceFilter.class);
 //                .oauth2Login();
         return httpSecurity.build();
     }
 
-    /**
-     * websocket请求?似乎并没有用
-     *
-     * @return
-     */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/webssh/**");
-
-    }
+//    /**
+//     * websocket请求?似乎并没有用
+//     *
+//     * @return
+//     */
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return web -> web.ignoring().requestMatchers("/webssh/**");
+//
+//    }
 
 
     /**

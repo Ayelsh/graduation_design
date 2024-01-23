@@ -46,6 +46,7 @@ public class User {
      */
     private Boolean status;
 
+
     /**
      * 邮箱
      */
@@ -80,7 +81,7 @@ public class User {
      * 创建时间
      */
     @DateTimeFormat
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -92,7 +93,7 @@ public class User {
      * 更新时间
      */
     @DateTimeFormat
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     /**

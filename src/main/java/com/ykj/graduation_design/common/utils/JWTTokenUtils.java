@@ -47,7 +47,7 @@ public class JWTTokenUtils {
      * @return
      */
     public static String createAccessToken(LoginUser loginUser) {
-        log.info("id:{}",loginUser.getUser().getId());
+
         String token = Jwts.builder()// 设置JWT
                 .setId(loginUser.getUser().getId().toString()) // 用户Id
                 .setSubject(loginUser.getUsername()) // 主题
@@ -58,7 +58,8 @@ public class JWTTokenUtils {
                 .claim("authorities", JSON.toJSONString(loginUser.getAuthorities())) // 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
                 .claim("ip", loginUser.getIp())
                 .compact();//以String格式输出
-        return JWTConfig.tokenPrefix + token;
+        //
+        return JWTConfig.tokenPrefix +token;
     }
 
     /**

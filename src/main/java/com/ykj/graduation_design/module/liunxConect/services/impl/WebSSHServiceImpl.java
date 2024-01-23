@@ -11,6 +11,7 @@ import com.ykj.graduation_design.module.liunxConect.pojo.WebSSHData;
 import com.ykj.graduation_design.module.liunxConect.services.WebSSHService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -52,6 +53,7 @@ public class WebSSHServiceImpl implements WebSSHService {
         String username = String.valueOf(session.getAttributes().get(ConstantPool.USERNAME));
         //将这个ssh连接信息放入map中
         sshMap.put(username, sshConnectInfo);
+
     }
 
 
@@ -90,20 +92,17 @@ public class WebSSHServiceImpl implements WebSSHService {
             SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(username);
             WebSSHData finalWebSSHData = webSSHData;
             //启动线程异步处理，执行线程--连接
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
+            executorService.execute(() -> {
+                try {
 
-                        connectToSSH(sshConnectInfo, finalWebSSHData, session);
-                        //保存覆盖新的channel
-                        sshMap.put(username, sshConnectInfo);
+                    connectToSSH(sshConnectInfo, finalWebSSHData, session);
+                    //保存覆盖新的channel
+                    sshMap.put(username, sshConnectInfo);
 
-                    } catch (JSchException | IOException e) {
-                        log.error("webssh连接异常");
-                        log.error("异常信息:{}", e.getMessage());
-                        close(session);
-                    }
+                } catch (JSchException | IOException e) {
+                    log.error("webssh连接异常");
+                    log.error("异常信息:{}", e.getMessage());
+                    close(session);
                 }
             });
         }
@@ -118,16 +117,18 @@ public class WebSSHServiceImpl implements WebSSHService {
 
             SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(username);
             Channel channel = sshConnectInfo.getChannel();
-            if (sshConnectInfo != null) {
+            executorService.execute(() -> {
                 try {
-//                    channel.connect(3000);
-                    transToSSH(channel, command, session);
+
+                    transToSSH(channel, command);
+
                 } catch (IOException e) {
                     log.error("webssh连接异常");
                     log.error("异常信息:{}", e.getMessage());
                     close(session);
                 }
-            }
+            });
+
         } else {
             log.error("不支持的操作");
             close(session);
@@ -136,7 +137,7 @@ public class WebSSHServiceImpl implements WebSSHService {
 
     @Override
     public void sendMessage(WebSocketSession session, byte[] buffer) throws IOException {
-        session.sendMessage(new TextMessage(buffer));
+        session.sendMessage(new BinaryMessage(buffer));
     }
 
     @Override
@@ -151,50 +152,143 @@ public class WebSSHServiceImpl implements WebSSHService {
         }
     }
 
+//    /**
+//     * @Description: 使用jsch连接终端
+//     * @Param: [cloudSSH, webSSHData, webSocketSession]
+//     * @return: void
+//     */
+//    private void connectToSSH(SSHConnectInfo sshConnectInfo, WebSSHData webSSHData, WebSocketSession webSocketSession) throws JSchException, IOException {
+//        //获取jsch的会话
+//        Session session = null;
+//        Properties config = new Properties();
+//        config.put("StrictHostKeyChecking", "no");
+//        session = sshConnectInfo.getjSch().getSession(webSSHData.getUsername(), webSSHData.getHost(), webSSHData.getPort());
+//        session.setConfig(config);
+//        session.setPassword(webSSHData.getPassword());
+//
+//        //连接  超时时间30s
+//        session.connect(30000);
+//
+//        //开启shell通道
+//        Channel channel = session.openChannel("shell");
+//
+//        //通道连接 超时时间3s
+//        channel.connect(3000);
+//
+//        //设置channel
+//        sshConnectInfo.setChannel(channel);
+//
+//        transToSSH(channel, "\r");
+//        session.disconnect();
+//
+//    }
+
+//    /**
+//     * @Description: 将消息转发到终端
+//     * @Param: [channel, data]
+//     * @return: void
+//     */
+//    private void transToSSH(Channel channel, String command, WebSocketSession webSocketSession) throws IOException {
+//
+//        assert channel != null;
+//        OutputStream outputStream = channel.getOutputStream();
+//        outputStream.write(command.getBytes());
+//        outputStream.flush();
+//        //读取终端返回的信息流
+//        InputStream inputStream = channel.getInputStream();
+//        try {
+//            //循环读取
+//            byte[] buffer = new byte[1024];
+//            int i = 0;
+//            //如果没有数据来，线程会一直阻塞在这个地方等待数据。
+//            while ((i = inputStream.read(buffer)) != -1) {
+//                sendMessage(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
+//            }
+//        } finally {
+//            channel.disconnect();
+//            if (inputStream != null) {
+//                inputStream.close();
+//            }
+//            outputStream.close();
+//            log.info("已关闭");
+//        }
+//
+//
+//    }
+
+
+//    @Override
+//    public void recvHandle(String buffer, WebSocketSession session) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        WebSSHData webSSHData = null;
+//        try {
+//            webSSHData = objectMapper.readValue(buffer, WebSSHData.class);
+//        } catch (IOException e) {
+//            logger.error("Json转换异常");
+//            logger.error("异常信息:{}", e.getMessage());
+//            return;
+//        }
+//        String userId = String.valueOf(session.getAttributes().get(ConstantPool.USER_UUID_KEY));
+//        if (ConstantPool.WEBSSH_OPERATE_CONNECT.equals(webSSHData.getOperate())) {
+//            //找到刚才存储的ssh连接对象
+//            SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(userId);
+//            //启动线程异步处理
+//            WebSSHData finalWebSSHData = webSSHData;
+//            executorService.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        connectToSSH(sshConnectInfo, finalWebSSHData, session);
+//                    } catch (JSchException | IOException e) {
+//                        logger.error("webssh连接异常");
+//                        logger.error("异常信息:{}", e.getMessage());
+//                        close(session);
+//                    }
+//                }
+//            });
+//        } else if (ConstantPool.WEBSSH_OPERATE_COMMAND.equals(webSSHData.getOperate())) {
+//            String command = webSSHData.getCommand();
+//            SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(userId);
+//            if (sshConnectInfo != null) {
+//                try {
+//                    transToSSH(sshConnectInfo.getChannel(), command);
+//                } catch (IOException e) {
+//                    logger.error("webssh连接异常");
+//                    logger.error("异常信息:{}", e.getMessage());
+//                    close(session);
+//                }
+//            }
+//        } else {
+//            logger.error("不支持的操作");
+//            close(session);
+//        }
+//    }
+
+
     /**
      * @Description: 使用jsch连接终端
      * @Param: [cloudSSH, webSSHData, webSocketSession]
      * @return: void
+     * @Author: NoCortY
+     * @Date: 2020/3/7
      */
     private void connectToSSH(SSHConnectInfo sshConnectInfo, WebSSHData webSSHData, WebSocketSession webSocketSession) throws JSchException, IOException {
-        //获取jsch的会话
         Session session = null;
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
+        //获取jsch的会话
         session = sshConnectInfo.getjSch().getSession(webSSHData.getUsername(), webSSHData.getHost(), webSSHData.getPort());
         session.setConfig(config);
         session.setPassword(webSSHData.getPassword());
-
         //连接  超时时间30s
         session.connect(30000);
-
-        //开启shell通道
         Channel channel = session.openChannel("shell");
-
         //通道连接 超时时间3s
         channel.connect(3000);
-
         //设置channel
         sshConnectInfo.setChannel(channel);
-
-        transToSSH(channel, "cat /etc/issue\r", webSocketSession);
-        session.disconnect();
-
-    }
-
-    /**
-     * @Description: 将消息转发到终端
-     * @Param: [channel, data]
-     * @return: void
-     */
-    private void transToSSH(Channel channel, String command, WebSocketSession webSocketSession) throws IOException {
-        if (channel != null) {
-            OutputStream outputStream = channel.getOutputStream();
-            outputStream.write(command.getBytes());
-            outputStream.flush();
-        }
-        //断言channel不为空，空则停止运行
-        assert channel != null;
+        //转发消息
+        transToSSH(channel, "\r");
         //读取终端返回的信息流
         InputStream inputStream = channel.getInputStream();
         try {
@@ -203,16 +297,25 @@ public class WebSSHServiceImpl implements WebSSHService {
             int i = 0;
             //如果没有数据来，线程会一直阻塞在这个地方等待数据。
             while ((i = inputStream.read(buffer)) != -1) {
-                log.info("返回信息：{}", Arrays.copyOfRange(buffer, 0, i));
                 sendMessage(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
             }
+
         } finally {
+            //断开连接后关闭会话
+            session.disconnect();
             channel.disconnect();
             if (inputStream != null) {
                 inputStream.close();
             }
         }
 
+    }
+
+    private void transToSSH(Channel channel, String command) throws IOException {
+        assert channel != null;
+        OutputStream outputStream = channel.getOutputStream();
+        outputStream.write(command.getBytes());
+        outputStream.flush();
 
     }
 

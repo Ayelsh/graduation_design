@@ -2,6 +2,8 @@ package com.ykj.graduation_design.module.liunxConect.handler;
 
 import com.ykj.graduation_design.config.ConstantPool;
 import com.ykj.graduation_design.module.liunxConect.services.WebSSHService;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +33,7 @@ import org.springframework.web.socket.*;
           log.info("用户:{},连接WebSSH", webSocketSession.getAttributes().get(ConstantPool.USERNAME));
           //调用初始化连接
           webSSHService.initConnection(webSocketSession);
-          webSSHService.sendMessage(webSocketSession, "请输出连接的Liunx信息".getBytes());
+//          webSSHService.sendMessage(webSocketSession, "请输出连接的Liunx信息".getBytes());
       }
 
       /**
@@ -40,7 +42,7 @@ import org.springframework.web.socket.*;
        * @return: void
        */
       @Override
-      public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
+      public void handleMessage(@NonNull WebSocketSession webSocketSession, @NonNull WebSocketMessage<?> webSocketMessage) throws Exception {
           if (webSocketMessage instanceof TextMessage) {
               log.info("用户:{},发送命令:{}", webSocketSession.getAttributes().get(ConstantPool.USERNAME), webSocketMessage.toString());
               //调用service接收消息
@@ -50,7 +52,7 @@ import org.springframework.web.socket.*;
           } else if (webSocketMessage instanceof PongMessage) {
 
           } else {
-              System.out.println("Unexpected WebSocket message type: " + webSocketMessage);
+              log.info("Unexpected WebSocket message type: {} " , webSocketMessage);
           }
       }
 
@@ -60,8 +62,8 @@ import org.springframework.web.socket.*;
        * @return: void
        */
       @Override
-      public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
-          log.error("数据传输错误");
+      public void handleTransportError(@NonNull WebSocketSession webSocketSession, Throwable throwable) {
+          log.error("数据传输错误:{}",throwable.toString());
       }
 
       /**
