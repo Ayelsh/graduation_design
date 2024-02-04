@@ -23,7 +23,8 @@ CREATE TABLE `sys_user`
   AUTO_INCREMENT = 2
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
 
-
+USE graduation_design;
+DROP TABLE IF EXISTS `article`;
 create table article
 (
     id                      bigint auto_increment comment '主键'

@@ -77,7 +77,7 @@ public class SecurityConfig {
                 //开放两个接口的post请求，一个注册，一个登录，其余anyRequest均要身份认证authenticated
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers(HttpMethod.POST, "/user/login", "/user/register")
+                                .requestMatchers("/user/login", "/user/register","/druid/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
