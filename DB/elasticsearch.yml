@@ -1,0 +1,25 @@
+# username= elastic
+# password= elastic
+# head_access_url: http://localhost:9100/?auth_user=elastic&auth_password=elastic
+# 数据目录位置
+path.data: /home/elastic/elasticsearch/data 
+# 日志目录位置
+path.logs: /home/elastic/elasticsearch/logs 
+#默认只允许本机访问，修改为0.0.0.0后则可以远程访问
+# 绑定到0.0.0.0，允许任何ip来访问
+network.host: 0.0.0.0
+cluster.name: elasticsearch 
+node.name: es-node0
+cluster.initial_master_nodes: ["es-node0"]
+http.port: 19200
+# 设置安全
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+discovery.seed_hosts: ["127.0.0.1"]
+ingest.geoip.downloader.enabled: false
+# 开启跨域访问支持，默认为false
+http.cors.enabled: true
+# 跨域访问允许的域名地址
+http.cors.allow-origin: "*"
+http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
+http.cors.allow-headers: Content-Type,Accept,Authorization,x-requested-with

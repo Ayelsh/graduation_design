@@ -16,4 +16,6 @@ public interface ArticleContentService {
     List<ArticleContent> allContentQuery();
 
     void addContent(ArticleContent articleContent);
+
+    ArticleContent queryByArticleId(Long id);
 }

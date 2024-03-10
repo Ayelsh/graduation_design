@@ -68,3 +68,5 @@ create table content
 
 create index forest_article_content_id_article_index
     on forest_article_content (id_article);
+
+

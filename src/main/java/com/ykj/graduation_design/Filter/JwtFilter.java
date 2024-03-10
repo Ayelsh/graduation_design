@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("进入token拦截器");
         //从请求头中获取token
         String token = request.getHeader("token");
-
+        log.info(token);
         //是否是系统定义的TOKEN
         if (token != null && token.startsWith(JWTConfig.tokenPrefix)) {
             // 是否在黑名单中

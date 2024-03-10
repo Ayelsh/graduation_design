@@ -5,7 +5,10 @@ import com.ykj.graduation_design.module.Blog.services.ArticleContentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +38,19 @@ public class ArticleContentServiceImpl implements ArticleContentService {
         return articleContentList;
     }
 
+
     @Override
     public void addContent(ArticleContent articleContent) {
         mongoTemplate.insert(articleContent);
 
+    }
+
+    @Override
+    public ArticleContent queryByArticleId(Long id) {
+        Query query  = new Query();
+        Criteria criteria = new Criteria();
+        criteria.and("id_article").is(id);
+        query.addCriteria(criteria);
+        return mongoTemplate.findOne(query,ArticleContent.class);
     }
 }

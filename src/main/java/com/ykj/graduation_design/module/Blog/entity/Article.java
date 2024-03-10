@@ -12,13 +12,15 @@ import java.util.Date;
  * @author ronger
  */
 @Data
-@TableName("Article")
-public class Article implements Serializable, Cloneable {
+@TableName("article")
+public class Article implements Serializable{
+
+
     /**
      * 主键
      */
     @TableId
-    private Long idArticle;
+    private Long id;
     /**
      * 文章标题
      */
@@ -83,4 +85,6 @@ public class Article implements Serializable, Cloneable {
      * 赞赏总数
      */
     private Integer articleSponsorCount;
+
+
 }
