@@ -1,8 +1,6 @@
 package com.ykj.graduation_design.module.login.controller;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.ykj.graduation_design.common.utils.HttpUtil;
-import com.ykj.graduation_design.common.Oauth2Properties;
+import com.ykj.graduation_design.common.properties.Oauth2Properties;
 import com.ykj.graduation_design.common.RestResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

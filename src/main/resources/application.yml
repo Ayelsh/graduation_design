@@ -25,7 +25,7 @@ jwt:
   # Token前缀
   tokenPrefix: Bearer
   # 过期时间，单位秒
-  expiration: 30000
+  expiration: 36000
   # 刷新时间，单位天
   refreshTime: 7
   # 配置白名单（不需要认证）
@@ -134,12 +134,22 @@ spring:
     username: elastic
     password: elastic
 # ===========================================================================
-# ????????
+# 文件配置
 # ===========================================================================
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+# 应用配置
+app:
+  # 文件下载路径
+  download-path: C:\\myFile\\download\\
+  # 文件上传路径
+  upload-path: C:\\myFile\\upload\\
+  # 支持的文件类型数组
+  file-type-array: .png,.jpg,.jpeg,.txt,.zip,.rar,.pdf,.xml,xls
+  # 最大文件大小限制
+  max-file-size: 8192
 
 mybatis:
   typeAliasesPackage: com.zhku.ayelsh.web_kali_liunx.file.pojo.ExcelEntity

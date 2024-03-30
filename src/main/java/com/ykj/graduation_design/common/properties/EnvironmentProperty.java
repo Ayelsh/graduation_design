@@ -1,4 +1,4 @@
-package com.ykj.graduation_design.common;
+package com.ykj.graduation_design.common.properties;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;

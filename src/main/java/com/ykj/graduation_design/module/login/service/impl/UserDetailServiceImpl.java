@@ -1,6 +1,7 @@
 package com.ykj.graduation_design.module.login.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ykj.graduation_design.common.entity.User;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
 import com.ykj.graduation_design.module.login.mapper.UserMapper;
@@ -30,6 +31,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
         userLambdaQueryWrapper.eq(User::getUserName, username);
+
+
         User user = userMapper.selectOne(userLambdaQueryWrapper);
 
         if (Objects.isNull(user)){

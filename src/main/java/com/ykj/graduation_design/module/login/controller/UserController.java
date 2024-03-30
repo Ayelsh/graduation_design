@@ -3,6 +3,7 @@ package com.ykj.graduation_design.module.login.controller;
 import cn.hutool.core.util.IdUtil;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.UserInfo;
 import com.ykj.graduation_design.common.utils.AccessAddressUtils;
 import com.ykj.graduation_design.common.utils.JWTTokenUtils;
 import com.ykj.graduation_design.config.JWTConfig;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +45,7 @@ public class UserController {
     @PostMapping("login")
     public void doLogin(@Validated @RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
         try {
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(loginDto.getUserName(), loginDto.getPassword());
             Authentication authentication = authenticationManager.authenticate(auth);
@@ -50,7 +53,7 @@ public class UserController {
 
             String ip = AccessAddressUtils.getIpAddress(request);
             LoginUser userDetails = (LoginUser) authentication.getPrincipal();
-            log.info("登录IP：{}",ip);
+            log.info("登录IP：{}", ip);
             userDetails.setIp(ip);
             String jwtToken = JWTTokenUtils.createAccessToken(userDetails);
 
@@ -65,7 +68,7 @@ public class UserController {
         } catch (Exception e) {
 
             log.error(e.getMessage());
-            RestResult.responseJson(response, new RestResult<>(406, "登录失败", "账号或密码错误，请重试！"));
+            RestResult.responseJson(response, new RestResult<>(600, "登录失败", "账号或密码错误，请重试！"));
 
         }
     }
@@ -87,11 +90,33 @@ public class UserController {
                 throw new Exception("密码为空");
         } catch (Exception e) {
             log.error(e.getMessage());
-            RestResult.responseJson(response, new RestResult<>(417, "注册失败", "e.getMessage()"));
+            RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
 
         }
     }
 
+    @GetMapping("userInfo")
+    public void userInfo(HttpServletResponse response) {
+
+        try {
+            RestResult.responseJson(response, new RestResult<>(200, null, userService.getInfo()));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, e.getMessage(), null));
+        }
+
+    }
+
+    @PostMapping("userInfo")
+    public void updateUser(HttpServletResponse response, @RequestBody UserInfo userInfo) {
+        try {
+
+            userService.updateUser(userInfo);
+            RestResult.responseJson(response, new RestResult<>(200, "修改成功", null));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(200, "修改失败", e.getMessage()));
+        }
+
+    }
     @DeleteMapping("logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
 

@@ -47,6 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 //过期判断
                 if (JWTTokenUtils.isExpiration(expiration)) {
+
                     // 加入黑名单
                     JWTTokenUtils.addBlackList(token);
                     // 是否在刷新期内

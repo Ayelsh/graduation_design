@@ -2,6 +2,7 @@ package com.ykj.graduation_design.module.login.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.UserInfo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,4 +14,8 @@ import com.ykj.graduation_design.common.entity.User;
 public interface UserService extends IService<User> {
 
     int insertUser(User user);
+
+    UserInfo getInfo();
+
+    void updateUser(UserInfo userInfo);
 }

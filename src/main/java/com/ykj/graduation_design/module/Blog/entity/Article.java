@@ -87,4 +87,7 @@ public class Article implements Serializable{
     private Integer articleSponsorCount;
 
 
+//    public Article(Article article){
+//        this = article;
+//    }
 }

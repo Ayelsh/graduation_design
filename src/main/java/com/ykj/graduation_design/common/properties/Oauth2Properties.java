@@ -1,4 +1,4 @@
-package com.ykj.graduation_design.common;
+package com.ykj.graduation_design.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
