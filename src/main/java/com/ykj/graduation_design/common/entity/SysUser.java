@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -20,9 +23,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @TableName(value = "sys_user")
-public class User {
+public class SysUser implements Serializable {
 
 
+    @Serial
+    private static final long serialVersionUID = 534054542481102627L;
     @TableId
     private Long id;
 
@@ -45,7 +50,6 @@ public class User {
      * 账号状态（0正常 1停用）
      */
     private Boolean status;
-
 
     /**
      * 邮箱
@@ -76,6 +80,11 @@ public class User {
      * 创建人的用户id
      */
     private Long createBy;
+
+    /**
+     * 用戶角色
+     */
+    private String roles;
 
     /**
      * 创建时间

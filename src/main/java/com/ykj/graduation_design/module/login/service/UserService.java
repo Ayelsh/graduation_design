@@ -1,8 +1,10 @@
 package com.ykj.graduation_design.module.login.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.common.entity.UserInfo;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,11 +13,15 @@ import com.ykj.graduation_design.common.entity.UserInfo;
  * @Date: 2023/12/04/10:33
  * @Description:
  */
-public interface UserService extends IService<User> {
+public interface UserService extends IService<SysUser> {
 
-    int insertUser(User user);
+    int insertUser(SysUser sysUser);
 
     UserInfo getInfo();
 
     void updateUser(UserInfo userInfo);
+
+    List<UserInfo> listUserInfo();
+
+    void updateUserByAdmin(SysUser sysUser);
 }

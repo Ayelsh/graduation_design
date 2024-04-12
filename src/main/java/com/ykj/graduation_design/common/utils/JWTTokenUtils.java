@@ -1,7 +1,9 @@
 package com.ykj.graduation_design.common.utils;
 
+
 import com.alibaba.fastjson2.JSON;
-import com.ykj.graduation_design.common.entity.User;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.config.JWTConfig;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
 import io.jsonwebtoken.Claims;
@@ -11,6 +13,8 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +53,7 @@ public class JWTTokenUtils {
     public static String createAccessToken(LoginUser loginUser) {
 
         String token = Jwts.builder()// 设置JWT
-                .setId(loginUser.getUser().getId().toString()) // 用户Id
+                .setId(loginUser.getSysUser().getId().toString()) // 用户Id
                 .setSubject(loginUser.getUsername()) // 主题
                 .setIssuedAt(new Date()) // 签发时间
                 .setIssuer("Ayelsh") // 签发者
@@ -79,25 +83,24 @@ public class JWTTokenUtils {
                 Claims claims = Jwts.parser().setSigningKey(JWTConfig.secret).parseClaimsJws(token).getBody();
 
                 // 获取用户信息
-                loginUser = new LoginUser(new User(),"");
+                loginUser = new LoginUser(new SysUser(),"");
                 loginUser.setId(Long.parseLong(claims.getId()));
 
                 loginUser.setUsername(claims.getSubject());
                 loginUser.setIp((String) claims.get("ip"));
-                // 获取角色
-//                Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-//                String authority = claims.get("authorities").toString();
-//                if (StringUtils.isNotEmpty(authority)) {
-//                    List<Map<String, String>> authorityList = JSON.parseObject(authority,
-//                            new TypeReference<List<Map<String, String>>>() {
-//                            });
+//                 获取角色
+                Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+                String authority = claims.get("authorities").toString();
+                if (StringUtils.isNotEmpty(authority)) {
+                     authorities = RoleConverter.convertJsonToRoles(authority);
+//                            JSON.parseObject(authority, new TypeReference<List<Map<String, String>>>() {});
 //                    for (Map<String, String> role : authorityList) {
 //                        if (!role.isEmpty()) {
 //                            authorities.add(new SimpleGrantedAuthority(role.get("authority")));
 //                        }
 //                    }
-//                }
-//				LoginUser.setAuthorities(authorities);
+                }
+				loginUser.setAuthorities(authorities);
             } catch (Exception e) {
                 log.error("解析Token异常：" + e);
             }
@@ -114,10 +117,10 @@ public class JWTTokenUtils {
      */
     public static String refreshAccessToken(String oldToken) {
         String username = JWTTokenUtils.getUserNameByToken(oldToken);
-        LoginUser LoginUser = (LoginUser) jwtTokenUtils.userDetailsService
+        LoginUser loginUser = (LoginUser) jwtTokenUtils.userDetailsService
                 .loadUserByUsername(username);
-        LoginUser.setIp(JWTTokenUtils.getIpByToken(oldToken));
-        return createAccessToken(LoginUser);
+        loginUser.setIp(JWTTokenUtils.getIpByToken(oldToken));
+        return createAccessToken(loginUser);
     }
 
 

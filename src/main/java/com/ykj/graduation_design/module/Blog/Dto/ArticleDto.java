@@ -16,16 +16,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArticleDto {
-    private String userName;
     private String articleTitle;
     private String articleThumbnailUrl;
+    private String author;
     private String articleContent;
 
     public ArticleDto(Article article,String articleContent){
         this.articleTitle = article.getArticleTitle();
         this.articleContent = articleContent;
-        this.userName = String.valueOf(article.getArticleAuthorId());
         this.articleThumbnailUrl = article.getArticleThumbnailUrl();
+        this.author = String.valueOf(article.getArticleAuthorId());
     }
 
 }

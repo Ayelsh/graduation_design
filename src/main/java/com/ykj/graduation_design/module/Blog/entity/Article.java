@@ -2,24 +2,28 @@ package com.ykj.graduation_design.module.Blog.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author ronger
+ * @author Ayelsh
  */
 @Data
 @TableName("article")
 public class Article implements Serializable{
-
-
+    @Serial
+    private static final long serialVersionUID = 8137202191128471034L;
     /**
      * 主键
      */
     @TableId
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
     /**
      * 文章标题
@@ -34,14 +38,6 @@ public class Article implements Serializable{
      */
     private Long articleAuthorId;
     /**
-     * 文章类型
-     */
-    private String articleType;
-    /**
-     * 文章标签
-     */
-    private String articleTags;
-    /**
      * 浏览总数
      */
     private Integer articleViewCount;
@@ -53,18 +49,6 @@ public class Article implements Serializable{
      * 评论总数
      */
     private Integer articleCommentCount;
-    /**
-     * 0:非优选1：优选;
-     */
-    private String articlePerfect;
-    /**
-     * 文章永久链接
-     */
-    private String articlePermalink;
-    /**
-     * 站内链接
-     */
-    private String articleLink;
     /**
      * 创建时间
      */
@@ -81,13 +65,5 @@ public class Article implements Serializable{
      * 点赞总数
      */
     private Integer articleThumbsUpCount;
-    /**
-     * 赞赏总数
-     */
-    private Integer articleSponsorCount;
 
-
-//    public Article(Article article){
-//        this = article;
-//    }
 }

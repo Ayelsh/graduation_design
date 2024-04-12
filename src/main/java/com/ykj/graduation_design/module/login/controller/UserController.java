@@ -2,10 +2,11 @@ package com.ykj.graduation_design.module.login.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.ykj.graduation_design.common.RestResult;
-import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.common.entity.UserInfo;
 import com.ykj.graduation_design.common.utils.AccessAddressUtils;
 import com.ykj.graduation_design.common.utils.JWTTokenUtils;
+import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.config.JWTConfig;
 import com.ykj.graduation_design.module.login.DTO.LoginDto;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,10 +25,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Ayelsh.ye
+ */
 @RestController
 @RequestMapping("/user/")
 @Slf4j
@@ -45,12 +51,13 @@ public class UserController {
     @PostMapping("login")
     public void doLogin(@Validated @RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
         try {
-
+            //登录认证
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(loginDto.getUserName(), loginDto.getPassword());
             Authentication authentication = authenticationManager.authenticate(auth);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            //构造token信息
             String ip = AccessAddressUtils.getIpAddress(request);
             LoginUser userDetails = (LoginUser) authentication.getPrincipal();
             log.info("登录IP：{}", ip);
@@ -72,19 +79,20 @@ public class UserController {
 
         }
     }
-
-    @PostMapping("register")
-    public void doRegister(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("addUser")
+    public void addUser(@RequestBody SysUser sysUser, HttpServletResponse response) {
         try {
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-                String password = passwordEncoder.encode(user.getPassword());
-                user.setPassword(password);
-                user.setId(Long.valueOf(IdUtil.getSnowflakeNextIdStr()));
-                if (userService.insertUser(user) == 0) {
+            if (sysUser.getPassword() != null && !sysUser.getPassword().isEmpty()) {
+                LoginUser loginUser = UserUtils.getCurrentUser();
+                String password = passwordEncoder.encode(sysUser.getPassword());
+                sysUser.setPassword(password);
+                sysUser.setId(Long.valueOf(IdUtil.getSnowflakeNextIdStr()));
+                sysUser.setCreateBy(loginUser.getId());
+                sysUser.setCreateTime(new Date());
+                if (userService.insertUser(sysUser) == 0) {
                     throw new Exception("用户名已存在");
                 }
-
-//                String jwtToken = JwtUtil.getToken(new LoginUser(user, AccessAddressUtils.getIpAddress(request)));
                 RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
             } else
                 throw new Exception("密码为空");
@@ -92,6 +100,34 @@ public class UserController {
             log.error(e.getMessage());
             RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
 
+        }
+    }
+    @PostMapping("register")
+    public void doRegister(@RequestBody SysUser sysUser, HttpServletResponse response) {
+        try {
+            if (sysUser.getPassword() != null && !sysUser.getPassword().isEmpty()) {
+                String password = passwordEncoder.encode(sysUser.getPassword());
+                sysUser.setPassword(password);
+                sysUser.setId(Long.valueOf(IdUtil.getSnowflakeNextIdStr()));
+                if (userService.insertUser(sysUser) == 0) {
+                    throw new Exception("用户名已存在");
+                }
+                RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
+            } else
+                throw new Exception("密码为空");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
+
+        }
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping
+    public void userQuery(HttpServletResponse response){
+        try {
+            RestResult.responseJson(response, new RestResult<>(200, null, userService.listUserInfo()));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, e.getMessage(), null));
         }
     }
 
@@ -115,6 +151,24 @@ public class UserController {
         } catch (Exception e) {
             RestResult.responseJson(response, new RestResult<>(200, "修改失败", e.getMessage()));
         }
+
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("userUpdate")
+    public void updateUserByAdmin( @RequestBody SysUser sysUser,HttpServletResponse response) {
+        try {
+
+
+            userService.updateUserByAdmin(sysUser);
+            RestResult.responseJson(response, new RestResult<>(200, "修改成功", null));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(200, "修改失败", e.getMessage()));
+        }
+
+    }
+    @DeleteMapping("deleteUser")
+    public void deleteUser(HttpServletResponse response, @RequestBody UserInfo userInfo){
+
 
     }
     @DeleteMapping("logout")

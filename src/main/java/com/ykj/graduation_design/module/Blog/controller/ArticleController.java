@@ -1,18 +1,25 @@
 package com.ykj.graduation_design.module.Blog.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykj.graduation_design.common.RestResult;
+import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.module.Blog.Dto.ArticleDto;
 import com.ykj.graduation_design.module.Blog.entity.Article;
 import com.ykj.graduation_design.module.Blog.entity.ArticleContent;
 import com.ykj.graduation_design.module.Blog.services.ArticleContentService;
 import com.ykj.graduation_design.module.Blog.services.ArticleService;
+import com.ykj.graduation_design.module.login.entity.LoginUser;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -51,27 +58,46 @@ public class ArticleController {
 
     @GetMapping("/initPostPage/{acticleId}")
     public void initPostPage(HttpServletResponse response, @PathVariable("acticleId") Long acticleId) {
-
+        log.info(String.valueOf(acticleId));
         ArticleContent articleContent = articleContentService.queryByArticleId(acticleId);
 
         if (Objects.isNull(articleContent)) {
             RestResult.responseJson(response, new RestResult<>(600, "请求数据为空！", null));
         } else {
             ArticleDto articleDto = new ArticleDto(articleService.getById(acticleId), articleContent.getArticleContent());
+            log.info(articleDto.getArticleTitle());
             articleDto.setArticleContent(articleContent.getArticleContent());
             RestResult.responseJson(response, new RestResult<>(200, "成功！", articleDto));
         }
 
     }
 
-    @PostMapping
-    public void addArticle(@RequestBody ArticleContent articleContent, HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping("newArticle")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void addArticle(@RequestBody ArticleDto articleDto,HttpServletResponse response) {
         try {
-            log.info(articleContent.toString());
+            //标题 内容 封面
+            LoginUser loginUser = UserUtils.getCurrentUser();
+            Article article = new Article();
+            ArticleContent articleContent = new ArticleContent();
+            long id = IdUtil.getSnowflakeNextId();
+            Date date = new Date();
+
+            article.setArticleAuthorId(loginUser.getId());
+            article.setArticleThumbnailUrl(articleDto.getArticleThumbnailUrl());
+            article.setId(id);
+            article.setCreatedTime(date);
+            article.setArticleTitle(articleDto.getArticleTitle());
+            articleContent.setArticleContent(articleDto.getArticleContent());
+            articleContent.setIdArticle(id);
+            articleContent.setCreatedTime(date);
+
+            articleService.save(article);
             articleContentService.addContent(articleContent);
+            RestResult.responseJson(response, new RestResult<>(200, "帖子发布成功！", null));
         } catch (Exception e) {
             log.error(e.getMessage());
-            RestResult.responseJson(response, new RestResult<>(500, "插入失败", e.getMessage()));
+            RestResult.responseJson(response, new RestResult<>(600, "帖子发布失败", e.getMessage()));
         }
 
 

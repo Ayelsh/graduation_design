@@ -1,6 +1,6 @@
 package com.ykj.graduation_design.module.login.entity;
 
-import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,32 +24,45 @@ import java.util.Collection;
 @Slf4j
 public class LoginUser implements UserDetails {
 
-    private User user;
+    private SysUser sysUser;
 
     private String ip;
 
+    private Set<GrantedAuthority> authorities;
+
+    public LoginUser(SysUser sysUser, String s) {
+        this.ip = s;
+        this.sysUser = sysUser;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
 
+//    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+//        return null;
+//    }
+
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return sysUser.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return sysUser.getUserName();
     }
 
     public void setUsername(String userName) {
-        user.setUserName(userName);
+        sysUser.setUserName(userName);
     }
 
+    public Long getId(){return sysUser.getId();}
+
     public void setId(Long id) {
-        user.setId(id);
+        sysUser.setId(id);
     }
 
     @Override

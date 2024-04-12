@@ -61,25 +61,25 @@ public class UserInfo {
     private String userType;
 
 
-    public UserInfo(User user) {
-        this.userName = user.getUserName();
-        this.nickName = user.getNickName();
-        this.email = user.getEmail();
-        this.phoneNumber = user.getPhoneNumber();
+    public UserInfo(SysUser sysUser) {
+        this.userName = sysUser.getUserName();
+        this.nickName = sysUser.getNickName();
+        this.email = sysUser.getEmail();
+        this.phoneNumber = sysUser.getPhoneNumber();
 
-        if (Objects.isNull(user.getStatus())) {
+        if (Objects.isNull(sysUser.getStatus())) {
             this.status = "未知";
-        } else  this.status = user.getStatus() ? "停用" : "正常";
+        } else  this.status = sysUser.getStatus() ? "停用" : "正常";
 
 
-        if (Objects.isNull(user.getSex())) {
+        if (Objects.isNull(sysUser.getSex())) {
             this.sex = '?';
-        } else this.sex = user.getSex() ? '女' : '男';
+        } else this.sex = sysUser.getSex() ? '女' : '男';
 
-        if (Objects.isNull(user.getUserType())) {
+        if (Objects.isNull(sysUser.getUserType())) {
             this.userType = "未知";
-        } else this.userType = user.getUserType() ? "管理员" : "用户";
-        this.avatar = user.getAvatar();
+        } else this.userType = sysUser.getUserType() ? "管理员" : "用户";
+        this.avatar = sysUser.getAvatar();
 
     }
 

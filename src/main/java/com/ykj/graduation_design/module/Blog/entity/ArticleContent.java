@@ -1,6 +1,8 @@
 package com.ykj.graduation_design.module.Blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,7 @@ public class ArticleContent {
     private ObjectId id;
 
     @Field("id_article")
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long idArticle;
 
     @Field("article_content")

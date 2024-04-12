@@ -1,7 +1,7 @@
 package com.ykj.graduation_design.module.login.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ykj.graduation_design.common.entity.User;
+import com.ykj.graduation_design.common.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -12,6 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @Description:
  */
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface UserMapper extends BaseMapper<SysUser> {
 
 }

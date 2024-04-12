@@ -10,6 +10,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * @author Ayelsh.ye
+ */
 @Component
 public class RedisUtils {
 

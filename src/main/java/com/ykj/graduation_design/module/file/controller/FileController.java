@@ -1,6 +1,7 @@
 package com.ykj.graduation_design.module.file.controller;
 
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.FileUploadUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,9 +44,6 @@ public class FileController {
     @PostMapping("uploadAvatar")
     public void uploadFile(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-
             String filePath = file.getOriginalFilename();
             String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
             String extension = "";
@@ -53,8 +51,8 @@ public class FileController {
             int dotIndex = fileName.lastIndexOf('.');
             if (dotIndex != -1 && dotIndex < fileName.length() - 1) {
                 extension = fileName.substring(dotIndex + 1);
-                fileName = username + "_" + "avatar." + extension;//重新生成文件名（根据具体情况生成对应文件名）
-            } else fileName = username + "_" + "avatar";//重新生成文件名（根据具体情况生成对应文件名）
+                fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "avatar." + extension;//重新生成文件名（根据具体情况生成对应文件名）
+            } else fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "avatar";//重新生成文件名（根据具体情况生成对应文件名）
 
 
             //获取jar包所在目录
