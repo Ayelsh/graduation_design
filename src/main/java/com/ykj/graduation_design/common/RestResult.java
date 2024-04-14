@@ -60,7 +60,7 @@ public class RestResult<T> {
 
 
 
-    public static void responseBlob(HttpServletResponse response, Resource resource) {
+    public static void  responseBlob(HttpServletResponse response, Resource resource) {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         String filename = resource.getFilename();

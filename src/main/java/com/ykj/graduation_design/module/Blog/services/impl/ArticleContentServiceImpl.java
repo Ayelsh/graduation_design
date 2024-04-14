@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 
@@ -41,19 +40,18 @@ public class ArticleContentServiceImpl implements ArticleContentService {
 
 
     @Override
-    public void addContent(ArticleContent articleContent) {
-
-
-        mongoTemplate.insert(articleContent);
-
+    public void addContent(ArticleContent articleContent) {mongoTemplate.insert(articleContent);
     }
 
     @Override
     public ArticleContent queryByArticleId(Long id) {
+        //构造条件查询器
         Query query  = new Query();
+        //构造条件
         Criteria criteria = new Criteria();
         criteria.and("id_article").is(id);
         query.addCriteria(criteria);
+        //返回查询结果
         return mongoTemplate.findOne(query,ArticleContent.class);
     }
 }

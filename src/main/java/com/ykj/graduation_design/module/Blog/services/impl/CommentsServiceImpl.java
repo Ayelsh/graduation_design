@@ -23,9 +23,8 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<ComentsDto> commentsList(Long id) {
 
-        return baseMapper.getParentList(id).stream().map(comments -> {
-            comments.setChildren(baseMapper.getChildrenList(comments.getId()));
-            return comments;
-        }).toList();
+        List<ComentsDto> list = baseMapper.getParentList(id);
+         list =  list.stream().peek(comment -> comment.setChildren(baseMapper.getChildrenList(comment.getId()))).toList();
+        return  list;
     }
 }

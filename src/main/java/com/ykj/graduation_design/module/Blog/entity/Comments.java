@@ -6,6 +6,8 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,7 @@ public class Comments implements Serializable {
     * 主键
     */
     @TableId
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
     /**
     * 评论内容
@@ -47,14 +50,17 @@ public class Comments implements Serializable {
     /**
     * 父评论id
     */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long commentId;
     /**
     * 文章id
     */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long articleId;
     /**
     * 回复的评论id
     */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long repalyId;
     /**
      * 回复的评论user

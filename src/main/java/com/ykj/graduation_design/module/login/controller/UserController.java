@@ -1,6 +1,8 @@
 package com.ykj.graduation_design.module.login.controller;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.common.entity.UserInfo;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ayelsh.ye
@@ -149,7 +152,7 @@ public class UserController {
             userService.updateUser(userInfo);
             RestResult.responseJson(response, new RestResult<>(200, "修改成功", null));
         } catch (Exception e) {
-            RestResult.responseJson(response, new RestResult<>(200, "修改失败", e.getMessage()));
+            RestResult.responseJson(response, new RestResult<>(600, "修改失败", e.getMessage()));
         }
 
     }
@@ -162,14 +165,30 @@ public class UserController {
             userService.updateUserByAdmin(sysUser);
             RestResult.responseJson(response, new RestResult<>(200, "修改成功", null));
         } catch (Exception e) {
-            RestResult.responseJson(response, new RestResult<>(200, "修改失败", e.getMessage()));
+            RestResult.responseJson(response, new RestResult<>(600, "修改失败", e.getMessage()));
         }
 
     }
-    @DeleteMapping("deleteUser")
-    public void deleteUser(HttpServletResponse response, @RequestBody UserInfo userInfo){
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("{userName}")
+    public void deleteUser(HttpServletResponse response, @PathVariable("userName")String userName){
 
+        try {
+            QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+            wrapper.lambda().eq(SysUser::getUserName, userName);
 
+            Long id = userService.getOne(wrapper).getId();
+            if(Objects.equals(UserUtils.getCurrentUser().getId(), id)){
+                throw new Exception("不允许删除当前登录用户！！！！");
+            }
+            if(userService.removeById(id)){
+            RestResult.responseJson(response, new RestResult<>(200, "删除成功", null));
+            }else {
+                RestResult.responseJson(response, new RestResult<>(604, "删除失败，查无此人", null));
+            }
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, "删除失败,", e.getMessage()));
+        }
     }
     @DeleteMapping("logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {

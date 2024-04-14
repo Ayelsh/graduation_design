@@ -17,6 +17,7 @@ import java.util.List;
  */
 @Mapper
 public interface CommentsMapper extends BaseMapper<Comments> {
+    //使用Select语句
     @Select("SELECT * FROM comments WHERE article_id = ${id} and comment_id IS NULL ")
     List<ComentsDto> getParentList(@Param("id") Long articleId);
 

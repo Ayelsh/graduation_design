@@ -25,21 +25,16 @@ import java.util.Date;
 public class CommentsController {
     @Autowired
     private CommentsService commentsService;
-
     @Autowired
     private UserService userService;
-
     @GetMapping("{arctileId}")
     public void comments(@PathVariable("arctileId") Long arctileId, HttpServletResponse response){
       try{
           RestResult.responseJson(response, new RestResult<>(200, "成功！", commentsService.commentsList(arctileId)));
       }catch (Exception e){
           RestResult.responseJson(response, new RestResult<>(600, "失败", e.getMessage()));
-
       }
-
     }
-
     @PostMapping
     public void newComments(@RequestBody Comments comments,HttpServletResponse response){
         try{
@@ -52,7 +47,6 @@ public class CommentsController {
             RestResult.responseJson(response, new RestResult<>(200, "成功！", comments));
         }catch (Exception e){
             RestResult.responseJson(response, new RestResult<>(600, "失败", e.getMessage()));
-
         }
     }
 }
