@@ -1,0 +1,35 @@
+@startuml
+actor User
+participant ArticleController
+participant UserUtils
+participant ArticleService
+participant ArticleContentService
+participant RestResult
+participant HttpServletResponse
+
+User -> ArticleController: 发送添加文章请求
+ArticleController -> UserUtils: 获取当前登录用户信息
+activate UserUtils
+UserUtils -> ArticleController: 返回当前登录用户信息
+ArticleController -> ArticleController: 创建帖子和帖子内容对象
+activate ArticleController
+ArticleController -> ArticleService: 保存帖子
+activate ArticleService
+ArticleService -> ArticleService: 设置帖子属性并保存
+ArticleService --> ArticleController: 帖子保存成功
+deactivate ArticleService
+ArticleController -> ArticleContentService: 保存帖子内容
+activate ArticleContentService
+ArticleContentService -> ArticleContentService: 设置帖子内容属性并保存
+ArticleContentService --> ArticleController: 帖子内容保存成功
+deactivate ArticleContentService
+ArticleController -> RestResult: 构建成功响应
+activate RestResult
+RestResult --> User: 返回成功响应
+deactivate RestResult
+ArticleController -> HttpServletResponse: 发送成功响应
+activate HttpServletResponse
+ArticleController --> User: 响应发送完成
+deactivate HttpServletResponse
+deactivate ArticleController
+@enduml

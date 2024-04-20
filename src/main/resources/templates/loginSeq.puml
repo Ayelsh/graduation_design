@@ -1,0 +1,23 @@
+@startuml
+actor User
+participant UserController
+participant AccessAddressUtils
+participant JWTTokenUtils
+participant RedisUtils
+participant RestResult
+User -> UserController: doLogin
+alt Try
+UserController -> AccessAddressUtils: 获取IP地址
+AccessAddressUtils --> UserController: 返回IP地址
+
+UserController -> JWTTokenUtils: 构造Token
+JWTTokenUtils --> UserController: Token
+
+UserController -> JWTTokenUtils: 设置token、 username、 ip等信息
+UserController -> RedisUtils: Redis存储key, hashKey, object, expire等信息
+
+RestResult -> User: responseJson(response, new RestResult<>(200, "登录成功！", fileName))
+else Catch (Exception e)
+    RestResult -> User: responseJson(response, new RestResult<>(600, "登录失败！", e.getMessage()))
+end
+@enduml

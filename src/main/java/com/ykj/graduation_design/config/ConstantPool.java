@@ -9,7 +9,7 @@ package com.ykj.graduation_design.config;
  */
 public class ConstantPool {
     /**
-     * 随机生成uuid的key名
+     * 链接key名
      */
     public static final String USERNAME = "username";
     /**

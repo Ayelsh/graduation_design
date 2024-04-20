@@ -1,0 +1,32 @@
+@startuml
+actor User
+participant CommentsController
+participant UserUtils
+participant UserService
+participant RestResult
+participant HttpServletResponse
+participant CommentsService
+
+User -> CommentsController: 发送新评论请求
+CommentsController -> UserUtils: 获取当前登录用户信息
+activate UserUtils
+UserUtils -> CommentsController: 返回当前登录用户信息
+CommentsController -> UserService: 根据用户信息获取系统用户信息
+activate UserService
+UserService --> CommentsController: 返回系统用户信息
+deactivate UserService
+CommentsController -> CommentsController: 设置评论作者信息和创建时间
+CommentsController -> CommentsService: 保存评论
+activate CommentsService
+CommentsService --> CommentsController: 评论保存成功
+deactivate CommentsService
+CommentsController -> RestResult: 构建成功响应
+activate RestResult
+RestResult --> CommentsController: 返回成功响应
+deactivate RestResult
+CommentsController -> HttpServletResponse: 发送成功响应
+activate HttpServletResponse
+HttpServletResponse --> User: 响应发送完成
+deactivate HttpServletResponse
+deactivate CommentsController
+@enduml

@@ -4,6 +4,8 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.IdUtil;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.FileUploadUtil;
+import com.ykj.graduation_design.module.file.entity.Resources;
+import com.ykj.graduation_design.module.file.services.ResourcesService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +38,18 @@ public class FileController {
 
     private final ResourceLoader resourceLoader;
 
+    private final static String suffixdirpath =  new ApplicationHome(FileController.class).getSource().getParentFile().toString();
+
+    @Autowired
+    private ResourcesService resourcesService;
+
     @Autowired
     public FileController(@Qualifier("webApplicationContext") ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
     @PostMapping("uploadAvatar")
-    public void uploadFile(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
+    public void uploadAvatar(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
         try {
             String filePath = file.getOriginalFilename();
             String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
@@ -72,7 +79,7 @@ public class FileController {
     }
 
     @GetMapping("/{filename:.+}")
-    public void getFile(@PathVariable String filename, HttpServletResponse response) {
+    public void getAvatar(@PathVariable String filename, HttpServletResponse response) {
         try{
             ApplicationHome applicationHome = new ApplicationHome(getClass());
             String dirPath = applicationHome.getSource().getParentFile().toString() + "\\upload\\";
@@ -86,6 +93,56 @@ public class FileController {
         }
 
 
+    }
+
+    @PostMapping
+    public void newResource(HttpServletResponse response, @RequestParam("file") MultipartFile file,@RequestParam("description ")String description) {
+        try {
+            String filePath = file.getOriginalFilename();
+            String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+            String extension = "";
+
+            int dotIndex = fileName.lastIndexOf('.');
+            if (dotIndex != -1 && dotIndex < fileName.length() - 1) {
+                extension = fileName.substring(dotIndex + 1);
+                fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "resource." + extension;//重新生成文件名（根据具体情况生成对应文件名）
+            } else fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "resource";//重新生成文件名（根据具体情况生成对应文件名）
+
+            //获取jar包所在目录
+            ApplicationHome applicationHome = new ApplicationHome(getClass());
+            File homePath = applicationHome.getSource();
+            //在jar包所在目录下生成一个upload文件夹用来存储上传的图片
+            String dirPath = homePath.getParentFile().toString() + "\\resource\\";
+            log.info(dirPath);
+
+            FileUploadUtil.uploadToServer(file, dirPath, fileName);
+            resourcesService.save(new Resources(fileName,description));
+            RestResult.responseJson(response, new RestResult<>(200, "上传成功！", fileName));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()));
+        }
+    }
+
+    @GetMapping("list")
+    public void listFile(HttpServletResponse response){
+        try{
+            RestResult.responseJson(response, new RestResult<>(200, "获取文件列表成功！",resourcesService.list()));
+        }catch (Exception e){
+            log.info("文件异常：{}",e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "获取文件列表失败",e.getMessage()));
+        }
+    }
+
+    @GetMapping("/resources/{id}")
+    public void getFileById(HttpServletResponse response,@PathVariable("id") Long id){
+        try{
+            String fileName = suffixdirpath + "\\resource\\"+resourcesService.getById(id).getFilename();
+            Resource file = resourceLoader.getResource("file:"+ fileName);
+            RestResult.responseBlob(response, file);
+        }catch (Exception e){
+            log.info("文件异常：{}",e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "获取文件失败",e.getMessage()));
+        }
     }
 
 }

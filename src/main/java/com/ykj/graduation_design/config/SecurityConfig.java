@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 //禁用csrf保护，前后端分离不需要
                 .csrf(AbstractHttpConfigurer::disable)
-                //禁用session，因为我们已经使用了JWT
+                //禁用session，因为已经使用了JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 //禁用httpBasic，因为我们传输数据用的是post，而且请求体是JSON
                 .httpBasic(AbstractHttpConfigurer::disable)

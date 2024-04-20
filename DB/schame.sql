@@ -22,6 +22,9 @@ create table sys_user
 )
     comment '用户表';
 
+CREATE INDEX idx_username
+    ON sys_user (user_name);
+
 USE graduation_design;
 DROP TABLE IF EXISTS `article`;
 create table article
@@ -41,6 +44,9 @@ create table article
 )
     comment '文章表 ' collate = utf8mb4_unicode_ci;
 
+CREATE INDEX idx_author_id
+    ON article (article_author_id);
+
 create table comments
 (
     id              bigint auto_increment comment '主键'
@@ -57,6 +63,10 @@ create table comments
     repaly_name     varchar(10)  null comment '回复的user'
 )
     comment '评论表 ' collate = utf8mb4_unicode_ci;
+CREATE INDEX idx_comment_id
+    ON comments (comment_id);
+CREATE INDEX idx_comment_id_and_article_id
+    ON comments (article_id,comment_id);
 
 create table button
 (
@@ -67,5 +77,16 @@ create table button
     created_time datetime     null comment '创建时间',
     updated_time datetime     null comment '更新时间',
     command_type tinyint(1)   null comment '命令类型'
+)
+    comment '按键表' collate = utf8mb4_unicode_ci;
+
+create table resources
+(
+    id           bigint auto_increment comment '主键'
+        primary key,
+    fileName     varchar(255) null comment '资源文件名',
+    description  varchar(255) null comment '资源描述',
+    created_time datetime     null comment '创建时间',
+    updated_time datetime     null comment '更新时间'
 )
     comment '按键表' collate = utf8mb4_unicode_ci;

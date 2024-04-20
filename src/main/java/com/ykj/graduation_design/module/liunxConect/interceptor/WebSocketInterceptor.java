@@ -1,5 +1,4 @@
 package com.ykj.graduation_design.module.liunxConect.interceptor;
-import cn.hutool.core.lang.UUID;
 import com.ykj.graduation_design.config.ConstantPool;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
 import lombok.extern.slf4j.Slf4j;

@@ -1,0 +1,41 @@
+@startuml
+actor User
+participant Controller
+participant ObjectMapper
+participant WebSSHData
+participant WebSocketSession
+participant ConstantPool
+participant SSHConnectInfo
+participant executorService
+participant Channel
+
+User -> Controller: 发送接收处理请求
+activate Controller
+Controller -> ObjectMapper: 解析JSON数据
+activate ObjectMapper
+ObjectMapper -> WebSSHData: 转换为WebSSHData对象
+activate WebSSHData
+ObjectMapper --> Controller: 返回WebSSHData对象
+deactivate ObjectMapper
+Controller -> WebSocketSession: 获取用户名
+activate WebSocketSession
+WebSocketSession --> Controller: 返回用户名
+deactivate WebSocketSession
+Controller -> ConstantPool: 检查操作类型
+activate ConstantPool
+ConstantPool --> Controller: 返回操作类型
+deactivate ConstantPool
+Controller -> executorService: 执行连接操作或命令操作
+activate executorService
+executorService -> SSHConnectInfo: 获取SSH连接信息
+activate SSHConnectInfo
+SSHConnectInfo --> executorService: 返回SSH连接信息
+deactivate SSHConnectInfo
+executorService -> Controller: 执行连接或命令操作
+deactivate executorService
+Controller -> WebSocketSession: 关闭会话
+activate WebSocketSession
+WebSocketSession --> Controller: 会话关闭完成
+deactivate WebSocketSession
+deactivate Controller
+@enduml
