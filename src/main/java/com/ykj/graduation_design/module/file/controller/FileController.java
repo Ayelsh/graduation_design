@@ -2,8 +2,11 @@ package com.ykj.graduation_design.module.file.controller;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.FileUploadUtil;
+import com.ykj.graduation_design.common.utils.MinioUtil;
+import com.ykj.graduation_design.module.Blog.entity.Article;
 import com.ykj.graduation_design.module.file.entity.Resources;
 import com.ykj.graduation_design.module.file.services.ResourcesService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +39,8 @@ import java.nio.file.Paths;
 @RequestMapping("/File")
 public class FileController {
 
+    private final MinioUtil minioUtil;
+
     private final ResourceLoader resourceLoader;
 
     private final static String suffixdirpath =  new ApplicationHome(FileController.class).getSource().getParentFile().toString();
@@ -44,8 +49,9 @@ public class FileController {
     private ResourcesService resourcesService;
 
     @Autowired
-    public FileController(@Qualifier("webApplicationContext") ResourceLoader resourceLoader) {
+    public FileController(@Qualifier("webApplicationContext") ResourceLoader resourceLoader,@Autowired MinioUtil minioUtil) {
         this.resourceLoader = resourceLoader;
+        this.minioUtil = minioUtil;
     }
 
     @PostMapping("uploadAvatar")
@@ -72,6 +78,17 @@ public class FileController {
 
             FileUploadUtil.uploadToServer(file, dirPath, fileName);
             RestResult.responseJson(response, new RestResult<>(200, "上传成功！", fileName));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()));
+        }
+
+    }
+
+    @PostMapping("uploadAvatarMinio")
+    public void uploadAvatarMinio(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
+        try {
+
+            RestResult.responseJson(response, new RestResult<>(200, "上传成功！",  minioUtil.uploadOne(file)));
         } catch (Exception e) {
             RestResult.responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()));
         }
@@ -124,12 +141,13 @@ public class FileController {
     }
 
     @GetMapping("list")
-    public void listFile(HttpServletResponse response){
-        try{
-            RestResult.responseJson(response, new RestResult<>(200, "获取文件列表成功！",resourcesService.list()));
+    public void listFile(HttpServletResponse response,Integer pageNumber, Integer pageSize){
+        try {
+            Page<Resources> page = new Page<>(pageNumber,pageSize);
+            page = resourcesService.page(page);
+            RestResult.responseJson(response, new RestResult<>(200, "成功！",page ));
         }catch (Exception e){
-            log.info("文件异常：{}",e.getMessage());
-            RestResult.responseJson(response, new RestResult<>(600, "获取文件列表失败",e.getMessage()));
+            RestResult.responseJson(response, new RestResult<>(600, "失败！", e.getMessage()));
         }
     }
 

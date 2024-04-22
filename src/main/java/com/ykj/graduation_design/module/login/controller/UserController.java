@@ -148,7 +148,6 @@ public class UserController {
     @PostMapping("userInfo")
     public void updateUser(HttpServletResponse response, @RequestBody UserInfo userInfo) {
         try {
-
             userService.updateUser(userInfo);
             RestResult.responseJson(response, new RestResult<>(200, "修改成功", null));
         } catch (Exception e) {

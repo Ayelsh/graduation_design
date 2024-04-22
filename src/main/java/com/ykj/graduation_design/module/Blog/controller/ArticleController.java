@@ -1,7 +1,10 @@
 package com.ykj.graduation_design.module.Blog.controller;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.module.Blog.Dto.ArticleDto;
@@ -55,6 +58,20 @@ public class ArticleController {
         RestResult.responseJson(response, new RestResult<>(200, "成功！", articleService.list()));
 
     }
+
+    @GetMapping("/initPagePage")
+    public void initPagePage(HttpServletResponse response,Integer pageNumber, Integer pageSize) {
+
+        try {
+            Page<Article> page = new Page<>(pageNumber,pageSize);
+            page = articleService.page(page);
+            RestResult.responseJson(response, new RestResult<>(200, "成功！",page ));
+        }catch (Exception e){
+
+            RestResult.responseJson(response, new RestResult<>(600, "失败！", e.getMessage()));
+        }
+    }
+
 
     @GetMapping("/initPostPage/{acticleId}")
     public void initPostPage(HttpServletResponse response, @PathVariable("acticleId") Long acticleId) {
