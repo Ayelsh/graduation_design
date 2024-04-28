@@ -1,12 +1,12 @@
 package com.ykj.graduation_design.module.liunxConect.controller;
 
 import com.ykj.graduation_design.common.RestResult;
+import com.ykj.graduation_design.module.liunxConect.eneity.Button;
 import com.ykj.graduation_design.module.liunxConect.services.ButtonServices;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,4 +30,15 @@ public class ButtonController {
             RestResult.responseJson(response, new RestResult<>(600, "失败", e.getMessage()));
         }
     }
+
+//    @PostMapping
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    public void newButton(@RequestBody Button button,HttpServletResponse response){
+//        try{
+//            button.setCreatedTime(se);
+//            RestResult.responseJson(response, new RestResult<>(200, "成功！", buttonServices.save()));
+//        }catch (Exception e){
+//            RestResult.responseJson(response, new RestResult<>(600, "失败", e.getMessage()));
+//        }
+//    }
 }

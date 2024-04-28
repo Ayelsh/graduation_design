@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.module.Blog.Dto.ArticleDto;
+import com.ykj.graduation_design.module.Blog.Dto.WebLogicData;
 import com.ykj.graduation_design.module.Blog.entity.Article;
 import com.ykj.graduation_design.module.Blog.entity.ArticleContent;
 import com.ykj.graduation_design.module.Blog.services.ArticleContentService;
@@ -119,4 +120,39 @@ public class ArticleController {
 
 
     }
+    @DeleteMapping("/deleteArticle/{acticleId}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deleteArticle(HttpServletResponse response, @PathVariable("acticleId") Long acticleId) {
+        try {
+            articleService.removeById(acticleId);
+            RestResult.responseJson(response, new RestResult<>(200, "帖子删除成功！", articleContentService.removeByArticleId(acticleId)));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "帖子删除失败", e.getMessage()));
+        }
+
+
+    }
+    @PostMapping("newArticleContent")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void addArticleContent(@RequestBody WebLogicData articleDto, HttpServletResponse response) {
+        try {
+            ArticleContent articleContent = new ArticleContent();
+
+            Date date = new Date();
+
+            articleContent.setArticleContent(articleDto.getContent());
+            articleContent.setIdArticle(articleDto.getId());
+            articleContent.setCreatedTime(date);
+
+            articleContentService.addContent(articleContent);
+            RestResult.responseJson(response, new RestResult<>(200, "帖子发布成功！", null));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "帖子发布失败", e.getMessage()));
+        }
+
+
+    }
+
 }

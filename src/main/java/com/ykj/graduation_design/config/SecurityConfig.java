@@ -77,8 +77,7 @@ public class SecurityConfig {
                 //开放两个接口的post请求，一个注册，一个登录，其余anyRequest均要身份认证authenticated
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("/user/login", "/user/register","/druid/**")
-                                .permitAll()
+                                .requestMatchers("/user/login", "/user/register","/druid/**","/user/code","/Article/newArticleContent").permitAll()
                                 .anyRequest()
                                 .authenticated())
                 //将用户授权时用到的JWT校验过滤器添加进SecurityFilterChain中，并放在UsernamePasswordAuthenticationFilter的前面

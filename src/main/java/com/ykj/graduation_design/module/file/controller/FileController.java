@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,7 +44,6 @@ public class FileController {
 
     private final ResourceLoader resourceLoader;
 
-    private final static String suffixdirpath =  new ApplicationHome(FileController.class).getSource().getParentFile().toString();
 
     @Autowired
     private ResourcesService resourcesService;
@@ -95,6 +95,31 @@ public class FileController {
 
     }
 
+    @PostMapping("uploadFile")
+    public void uploadFiles(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
+        try {
+
+
+            RestResult.responseJson(response, new RestResult<>(200, "上传成功！",  minioUtil.uploadOne(file)));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()));
+        }
+
+    }
+
+    @PostMapping("submit")
+    public void submitFiles(HttpServletResponse response, @RequestBody Resources resources) {
+        try {
+            resources.setCreatedTime(new Date());
+            resources.setUpdatedTime(new Date());
+            RestResult.responseJson(response, new RestResult<>(200, "上传成功！",  resourcesService.save(resources)));
+        } catch (Exception e) {
+            RestResult.responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()));
+        }
+
+    }
+
+
     @GetMapping("/{filename:.+}")
     public void getAvatar(@PathVariable String filename, HttpServletResponse response) {
         try{
@@ -123,7 +148,9 @@ public class FileController {
             if (dotIndex != -1 && dotIndex < fileName.length() - 1) {
                 extension = fileName.substring(dotIndex + 1);
                 fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "resource." + extension;//重新生成文件名（根据具体情况生成对应文件名）
-            } else fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "resource";//重新生成文件名（根据具体情况生成对应文件名）
+            } else {
+                fileName = IdUtil.getSnowflakeNextIdStr() + "_" + "resource";//重新生成文件名（根据具体情况生成对应文件名）
+            }
 
             //获取jar包所在目录
             ApplicationHome applicationHome = new ApplicationHome(getClass());
@@ -140,6 +167,8 @@ public class FileController {
         }
     }
 
+
+
     @GetMapping("list")
     public void listFile(HttpServletResponse response,Integer pageNumber, Integer pageSize){
         try {
@@ -151,16 +180,27 @@ public class FileController {
         }
     }
 
+
+
     @GetMapping("/resources/{id}")
-    public void getFileById(HttpServletResponse response,@PathVariable("id") Long id){
+    public void getFileUrl(HttpServletResponse response,@PathVariable("id") Long id){
         try{
-            String fileName = suffixdirpath + "\\resource\\"+resourcesService.getById(id).getFilename();
-            Resource file = resourceLoader.getResource("file:"+ fileName);
-            RestResult.responseBlob(response, file);
+            RestResult.responseJson(response, new RestResult<>(200, "获取Url成功",minioUtil.downloadUrl(resourcesService.getById(id).getFilename())));
         }catch (Exception e){
             log.info("文件异常：{}",e.getMessage());
             RestResult.responseJson(response, new RestResult<>(600, "获取文件失败",e.getMessage()));
         }
     }
+
+    @DeleteMapping("/resources/{id}")
+    public void deleteResource(HttpServletResponse response,@PathVariable("id") Long id){
+        try{
+            RestResult.responseJson(response, new RestResult<>(200, "获取Url成功",resourcesService.removeById(id)));
+        }catch (Exception e){
+            log.info("文件异常：{}",e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "获取文件失败",e.getMessage()));
+        }
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.ykj.graduation_design.module.Blog.services;
 
+import com.mongodb.client.result.DeleteResult;
 import com.ykj.graduation_design.module.Blog.entity.ArticleContent;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface ArticleContentService {
     void addContent(ArticleContent articleContent);
 
     ArticleContent queryByArticleId(Long id);
+
+    DeleteResult removeByArticleId(Long id);
 }

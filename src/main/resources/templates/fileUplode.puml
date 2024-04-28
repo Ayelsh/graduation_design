@@ -1,66 +1,30 @@
-'@startuml
-'skinparam monochrome true
-'
-'actor User
-'participant FileController
-'participant "MultipartFile" as MultipartFile
-'participant "ApplicationHome" as ApplicationHome
-'participant "File" as File
-'participant "FileUploadUtil" as FileUploadUtil
-'participant "RestResult" as RestResult
-'alt not catch catch Exception e
-'User -> FileController: uploadFile(HttpServletResponse, MultipartFile)
-'activate FileController
-'FileController -> MultipartFile: getOriginalFilename()
-'alt dotIndex != -1 && dotIndex < fileName.length() - 1
-'    FileController -> File: IdUtil.getSnowflakeNextIdStr()
-'    FileController -> FileUploadUtil: uploadToServer(MultipartFile, String, String)
-'    deactivate FileController
-'else
-'    deactivate FileController
-'end
-'FileController -> RestResult: new(200, "上传成功！", fileName)
-'RestResult -> User: responseJson(RestResult)
-'
-'else catch Exception e
-'    RestResult -> User: responseJson(RestResult)
-'    deactivate FileController
-'end
-'
-'@enduml
 @startuml
 actor User
 participant FileController
-participant FileUploadUtil
-participant RestResult
-participant ApplicationHome
-participant File
-participant IdUtil
 participant MultipartFile
-participant HttpServletResponse
-participant String
+participant minioClient
+participant PutObjectArgs
+participant InputStream
+participant IOException
 
-User -> FileController: uploadFile(response: HttpServletResponse, file: MultipartFile)
-alt Try
-    FileController -> MultipartFile: getOriginalFilename()
-    MultipartFile -> String: filePath
-    String -> String: substring(lastIndexOf("\\") + 1)
-    String -> String: extension = ""
-    String -> String: fileName
-    String -> int: dotIndex = lastIndexOf('.')
-     alt dotIndex != -1 && dotIndex < fileName.length() - 1
-        String -> String: extension = substring(dotIndex + 1)
-        String -> String: fileName = SnowflakeNextIdStr() + "_" + "avatar." + extension
-     else
-        String -> String: fileName = SnowflakeNextIdStr() + "_" + "avatar"
-     end
-    FileController -> ApplicationHome: new(getClass())
-    ApplicationHome -> File: getSource()
-    File -> File: getParentFile()
-    File -> String: dirPath = toString() + "\\upload\\"
-    FileController -> FileUploadUtil: uploadToServer(file, dirPath, fileName)
-    RestResult -> User: responseJson(response, new RestResult<>(200, "上传成功！", fileName))
-else Catch (Exception e)
-    RestResult -> User: responseJson(response, new RestResult<>(600, "上传失败！", e.getMessage()))
-end
+User -> FileController: 发送上传文件请求
+activate FileController
+FileController -> MultipartFile: 获取上传的文件信息
+activate MultipartFile
+MultipartFile --> FileController: 返回上传的文件信息
+deactivate MultipartFile
+FileController -> minioClient: 执行文件上传操作
+activate minioClient
+minioClient -> PutObjectArgs: 构建上传参数
+activate PutObjectArgs
+PutObjectArgs --> minioClient: 返回上传参数
+deactivate PutObjectArgs
+minioClient --> FileController: 完成文件上传
+deactivate minioClient
+FileController -> InputStream: 处理文件输入流
+activate InputStream
+InputStream --> FileController: 返回输入流处理结果
+deactivate InputStream
+FileController -> User: 返回上传文件的URL
+deactivate FileController
 @enduml

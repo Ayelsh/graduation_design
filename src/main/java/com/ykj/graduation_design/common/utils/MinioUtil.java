@@ -1,7 +1,8 @@
 package com.ykj.graduation_design.common.utils;
-
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import io.minio.*;
+import io.minio.errors.*;
+import io.minio.http.Method;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,12 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,14 +60,7 @@ public class MinioUtil {
         }
     }
 
-    /**
-     * description: 上传文件
-     *
-     * @param multipartFile
-     * @return: java.lang.String
-     * @author: weirx
-     * @time: 2021/8/25 10:44
-     */
+
     public List<String> upload(MultipartFile[] multipartFile) {
         List<String> names = new ArrayList<>(multipartFile.length);
         for (MultipartFile file : multipartFile) {
@@ -102,14 +97,7 @@ public class MinioUtil {
         return names;
     }
 
-    /**
-     * description: 上传文件
-     *
-     * @param file
-     * @return: java.lang.String
-     * @author: weirx
-     * @time: 2021/8/25 10:44
-     */
+
     public String uploadOne(MultipartFile file) {
 
 
@@ -146,14 +134,17 @@ public class MinioUtil {
         return endpoint+"/"+bucketName+"/"+fileName;
     }
 
-    /**
-     * description: 下载文件
-     *
-     * @param fileName
-     * @return: org.springframework.http.ResponseEntity<byte [ ]>
-     * @author: weirx
-     * @time: 2021/8/25 10:34
-     */
+    public String downloadUrl(String fileName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+
+        GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
+                .bucket(bucketName)
+                .object(fileName)
+                .method(Method.GET).build();
+        return minioClient.getPresignedObjectUrl(args);
+
+    }
+
     public ResponseEntity<byte[]> download(String fileName) {
         ResponseEntity<byte[]> responseEntity = null;
         InputStream in = null;

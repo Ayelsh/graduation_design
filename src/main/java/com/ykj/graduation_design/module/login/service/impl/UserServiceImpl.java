@@ -1,6 +1,8 @@
 package com.ykj.graduation_design.module.login.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.common.entity.UserInfo;
 import com.ykj.graduation_design.common.utils.UserUtils;
@@ -8,6 +10,9 @@ import com.ykj.graduation_design.module.login.entity.LoginUser;
 import com.ykj.graduation_design.module.login.mapper.UserMapper;
 import com.ykj.graduation_design.module.login.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.index.qual.SameLen;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +31,7 @@ import java.util.Objects;
  * @Description:
  */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements UserService {
     @Resource
     PasswordEncoder passwordEncoder;
@@ -87,6 +93,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         sysUser.setStatus(sysUser.getStatus() != null ? sysUser.getStatus() : oldSysUser.getStatus());
         sysUser.setSex(sysUser.getSex() != null ? sysUser.getSex() : oldSysUser.getSex());
 
+    }
+
+    @Override
+    public boolean checkValueExist(String value, String columnName) {
+        return this.baseMapper.checkExist(value,columnName);
+    }
+
+    @Override
+    public void doRegister(SysUser sysUser, HttpServletResponse response) {
+        try {
+            if (!sysUser.getPassword().isBlank()) {
+                String password = passwordEncoder.encode(sysUser.getPassword());
+                sysUser.setPassword(password);
+                sysUser.setId(Long.valueOf(IdUtil.getSnowflakeNextIdStr()));
+                sysUser.setRoles("ROLE_USER");
+                sysUser.setStatus(true);
+                sysUser.setCreateTime(new Date());
+
+                if(checkValueExist(sysUser.getUserName(),"user_name")){
+                    throw new RuntimeException("用户名已存在");
+                } else if (checkValueExist(sysUser.getEmail(),"email")) {
+                    throw new RuntimeException("邮箱已使用");
+                }else {
+                    save(sysUser);
+                    RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
+                }
+            } else {
+                throw new Exception("密码为空");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
+
+        }
     }
 
 

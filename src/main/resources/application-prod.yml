@@ -1,7 +1,7 @@
 server:
-  port: 80
+  port: 8011
 minio:
-  endpoint: http://192.168.44.129:9000
+  endpoint: http://127.0.0.1:9000
   accessKey: admin
   secretKey: Minio962464
   bucketName: graduation-design
@@ -35,18 +35,7 @@ jwt:
   refreshTime: 7
   # 配置白名单（不需要认证）
   antMatchers: /login/**,/register/**,/static/**,/druid/**
-# ===========================================================================
-# MyBatis-plus 打印
-# ===========================================================================
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
-  # ===========================================================================
-  # MySql数据源
-  # ===========================================================================
-  profiles:
-    active: dev
   mail:
     username: 15768206596@163.com
     password: UHQLMHPWQHLPFEYE
@@ -65,11 +54,14 @@ spring:
       mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
       mail.smtp.socketFactory.fallback: false
     debug: true
+  # ===========================================================================
+  # MySql数据源
+  # ===========================================================================
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.44.1:3306/graduation_design
-    username: root
-    password: root
+    url: jdbc:mysql://127.0.0.1:3366/mydesign
+    username: prodUser
+    password: 962464
     type: com.alibaba.druid.pool.DruidDataSource
     # Druid的其他属性配置
     druid:
@@ -150,8 +142,8 @@ spring:
       host: 127.0.0.1
       port: 27017
       authentication-database: admin
-      username: root
-      password: root
+      username: graduation_design
+      password: 962464
       database: graduation_design
   # ===========================================================================
   # ElasticSearch配置

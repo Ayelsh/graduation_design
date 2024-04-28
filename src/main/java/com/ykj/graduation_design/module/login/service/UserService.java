@@ -3,6 +3,7 @@ package com.ykj.graduation_design.module.login.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ykj.graduation_design.common.entity.SysUser;
 import com.ykj.graduation_design.common.entity.UserInfo;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -24,4 +25,8 @@ public interface UserService extends IService<SysUser> {
     List<UserInfo> listUserInfo();
 
     void updateUserByAdmin(SysUser sysUser);
+
+    boolean checkValueExist(String value, String columnName);
+
+    void doRegister(SysUser sysUser, HttpServletResponse response);
 }

@@ -1,5 +1,6 @@
 package com.ykj.graduation_design.module.Blog.services.impl;
 
+import com.mongodb.client.result.DeleteResult;
 import com.ykj.graduation_design.module.Blog.entity.ArticleContent;
 import com.ykj.graduation_design.module.Blog.services.ArticleContentService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +54,17 @@ public class ArticleContentServiceImpl implements ArticleContentService {
         query.addCriteria(criteria);
         //返回查询结果
         return mongoTemplate.findOne(query,ArticleContent.class);
+    }
+
+    @Override
+    public DeleteResult removeByArticleId(Long id) {
+        //构造条件查询器
+        Query query  = new Query();
+        //构造条件
+        Criteria criteria = new Criteria();
+        criteria.and("id_article").is(id);
+        query.addCriteria(criteria);
+        return  mongoTemplate.remove(query,ArticleContent.class);
+
     }
 }

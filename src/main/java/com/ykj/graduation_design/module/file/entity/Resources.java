@@ -48,6 +48,11 @@ public class Resources implements Serializable {
      */
     private Date updatedTime;
 
+    /**
+     * 资源URL
+     */
+    private String fileUrl;
+
     public Resources( String filename,String description){
         this.filename = filename;
         this.description = description;

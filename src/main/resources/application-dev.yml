@@ -35,18 +35,8 @@ jwt:
   refreshTime: 7
   # 配置白名单（不需要认证）
   antMatchers: /login/**,/register/**,/static/**,/druid/**
-# ===========================================================================
-# MyBatis-plus 打印
-# ===========================================================================
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
-  # ===========================================================================
-  # MySql数据源
-  # ===========================================================================
-  profiles:
-    active: dev
+  #邮件发送
   mail:
     username: 15768206596@163.com
     password: UHQLMHPWQHLPFEYE
@@ -65,6 +55,9 @@ spring:
       mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
       mail.smtp.socketFactory.fallback: false
     debug: true
+  # ===========================================================================
+  # MySql数据源
+  # ===========================================================================
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.44.1:3306/graduation_design
@@ -101,6 +94,8 @@ spring:
       max-pool-prepared-statement-per-connection-size: -1
       # 合并多个DruidDataSource的监控数据
       use-global-data-source-stat: true
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+#      connect-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
       web-stat-filter:
         # 是否启用StatFilter默认值true
         enabled: true

@@ -12,12 +12,14 @@ import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.config.JWTConfig;
 import com.ykj.graduation_design.module.login.DTO.LoginDto;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
+import com.ykj.graduation_design.module.login.service.EmailService;
 import com.ykj.graduation_design.module.login.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,13 +44,16 @@ import java.util.Objects;
 public class UserController {
 
     @Resource
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Resource
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
 
     @PostMapping("login")
@@ -77,8 +82,8 @@ public class UserController {
 
         } catch (Exception e) {
 
-            log.error(e.getMessage());
-            RestResult.responseJson(response, new RestResult<>(600, "登录失败", "账号或密码错误，请重试！"));
+            log.info(e.getMessage());
+            RestResult.responseJson(response, new RestResult<>(600, "登录失败", e.getMessage()));
 
         }
     }
@@ -107,23 +112,26 @@ public class UserController {
     }
     @PostMapping("register")
     public void doRegister(@RequestBody SysUser sysUser, HttpServletResponse response) {
-        try {
-            if (sysUser.getPassword() != null && !sysUser.getPassword().isEmpty()) {
-                String password = passwordEncoder.encode(sysUser.getPassword());
-                sysUser.setPassword(password);
-                sysUser.setId(Long.valueOf(IdUtil.getSnowflakeNextIdStr()));
-                if (userService.insertUser(sysUser) == 0) {
-                    throw new Exception("用户名已存在");
-                }
-                RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
-            } else
-                throw new Exception("密码为空");
-        } catch (Exception e) {
-            log.error(e.getMessage());
+        try{
+        userService.doRegister(sysUser,response);}
+        catch (Exception e){
             RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
-
         }
     }
+
+
+    @GetMapping("code")
+    public void getCode( String email, HttpServletResponse response) {
+        log.info(email);
+        emailService.sendCode(response,email);
+    }
+    @PostMapping("code")
+    public void verCode( HttpServletResponse response,@RequestParam("email") String email,@RequestParam("code")String code) {
+        log.info(email);
+        log.info(code);
+        emailService.VerCode(response,email,code);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public void userQuery(HttpServletResponse response){
@@ -201,4 +209,6 @@ public class UserController {
         SecurityContextHolder.clearContext();
         RestResult.responseJson(response, new RestResult<>(200, "登出成功", null));
     }
+
+
 }

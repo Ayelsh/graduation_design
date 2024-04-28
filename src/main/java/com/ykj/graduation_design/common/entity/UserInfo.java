@@ -69,16 +69,22 @@ public class UserInfo {
 
         if (Objects.isNull(sysUser.getStatus())) {
             this.status = "未知";
-        } else  this.status = sysUser.getStatus() ? "停用" : "正常";
+        } else {
+            this.status = sysUser.getStatus() ? "正常" : "停用";
+        }
 
 
         if (Objects.isNull(sysUser.getSex())) {
             this.sex = '?';
-        } else this.sex = sysUser.getSex() ? '女' : '男';
+        } else {
+            this.sex = sysUser.getSex() ? '男' : '女';
+        }
 
         if (Objects.isNull(sysUser.getUserType())) {
             this.userType = "未知";
-        } else this.userType = sysUser.getUserType() ? "管理员" : "用户";
+        } else {
+            this.userType = sysUser.getUserType() ? "管理员" : "用户";
+        }
         this.avatar = sysUser.getAvatar();
 
     }
