@@ -102,8 +102,9 @@ public class UserController {
                     throw new Exception("用户名已存在");
                 }
                 RestResult.responseJson(response, new RestResult<>(200, "注册成功", "请于登录页面登录"));
-            } else
+            } else {
                 throw new Exception("密码为空");
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
             RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));

@@ -1,6 +1,7 @@
 package com.ykj.graduation_design.module.Blog.controller;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
@@ -65,7 +66,9 @@ public class ArticleController {
 
         try {
             Page<Article> page = new Page<>(pageNumber,pageSize);
-            page = articleService.page(page);
+            LambdaQueryWrapper<Article> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.orderByDesc(Article::getCreatedTime);
+            page = articleService.page(page,lambdaQueryWrapper);
             RestResult.responseJson(response, new RestResult<>(200, "成功！",page ));
         }catch (Exception e){
 

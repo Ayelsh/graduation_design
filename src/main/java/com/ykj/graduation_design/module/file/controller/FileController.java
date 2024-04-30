@@ -3,6 +3,7 @@ package com.ykj.graduation_design.module.file.controller;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.utils.FileUploadUtil;
 import com.ykj.graduation_design.common.utils.MinioUtil;
@@ -129,7 +130,7 @@ public class FileController {
             Resource file = resourceLoader.getResource("file:" + dirPath + filename);
             log.info("文件上传：{}", file.getURI());
             RestResult.responseBlob(response, file);
-        }catch (Exception e){
+        } catch (Exception e ){
             log.info("文件异常：{}",e.getMessage());
             RestResult.responseJson(response, new RestResult<>(600, "读取失败！"));
         }

@@ -110,6 +110,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
                 sysUser.setRoles("ROLE_USER");
                 sysUser.setStatus(true);
                 sysUser.setCreateTime(new Date());
+                sysUser.setUserType(false);
 
                 if(checkValueExist(sysUser.getUserName(),"user_name")){
                     throw new RuntimeException("用户名已存在");
