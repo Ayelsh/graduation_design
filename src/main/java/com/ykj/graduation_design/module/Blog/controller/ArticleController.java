@@ -55,12 +55,14 @@ public class ArticleController {
 
     @GetMapping("/initPage")
     public void initPage(HttpServletResponse response) {
-
-
         RestResult.responseJson(response, new RestResult<>(200, "成功！", articleService.list()));
-
     }
 
+    @GetMapping("/searchPage")
+    public void searchPage(String keyValue,Integer pageNumber, Integer pageSize,HttpServletResponse response) {
+        RestResult.responseJson(response, new RestResult<>(200, "成功！", articleService.titleQuery(keyValue,pageNumber,pageSize)));
+
+    }
     @GetMapping("/initPagePage")
     public void initPagePage(HttpServletResponse response,Integer pageNumber, Integer pageSize) {
 
@@ -128,6 +130,7 @@ public class ArticleController {
     public void deleteArticle(HttpServletResponse response, @PathVariable("acticleId") Long acticleId) {
         try {
             articleService.removeById(acticleId);
+            articleContentService.removeByArticleId(acticleId);
             RestResult.responseJson(response, new RestResult<>(200, "帖子删除成功！", articleContentService.removeByArticleId(acticleId)));
         } catch (Exception e) {
             log.error(e.getMessage());

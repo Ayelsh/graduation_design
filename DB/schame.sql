@@ -96,3 +96,5 @@ create table resources
     file_url      varchar(255) null comment '资源文件URL'
 )
     comment '按键表' collate = utf8mb4_unicode_ci;
+
+update article set article_author_id = 1783786073882198016 where article_author_id IS NULL

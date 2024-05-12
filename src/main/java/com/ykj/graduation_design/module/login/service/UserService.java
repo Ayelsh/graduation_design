@@ -29,4 +29,5 @@ public interface UserService extends IService<SysUser> {
     boolean checkValueExist(String value, String columnName);
 
     void doRegister(SysUser sysUser, HttpServletResponse response);
+    void doForget(SysUser sysUser, HttpServletResponse response);
 }

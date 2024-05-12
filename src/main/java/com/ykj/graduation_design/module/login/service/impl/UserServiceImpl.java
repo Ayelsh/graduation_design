@@ -1,6 +1,7 @@
 package com.ykj.graduation_design.module.login.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ykj.graduation_design.common.RestResult;
 import com.ykj.graduation_design.common.entity.SysUser;
@@ -9,6 +10,7 @@ import com.ykj.graduation_design.common.utils.UserUtils;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
 import com.ykj.graduation_design.module.login.mapper.UserMapper;
 import com.ykj.graduation_design.module.login.service.UserService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -80,8 +82,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
 
     @Override
     public void updateUserByAdmin(SysUser sysUser) {
-        SysUser oldSysUser = baseMapper.selectById(sysUser);
+        SysUser oldSysUser = baseMapper.selectOne(new QueryWrapper<SysUser>().eq("user_name",sysUser.getUserName()));
         LoginUser loginUser = UserUtils.getCurrentUser();
+        sysUser.setId(oldSysUser.getId());
         sysUser.setUpdateBy(loginUser.getId());
         sysUser.setUpdateTime(new Date());
         sysUser.setNickName(sysUser.getNickName() != null ? sysUser.getNickName() : oldSysUser.getNickName());
@@ -89,10 +92,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
         sysUser.setAvatar(sysUser.getAvatar() != null ? sysUser.getAvatar() : oldSysUser.getAvatar());
         sysUser.setEmail(sysUser.getEmail() != null ? sysUser.getEmail() : oldSysUser.getEmail());
         sysUser.setUserName(sysUser.getUserName() != null ? sysUser.getUserName() : oldSysUser.getUserName());
-        sysUser.setPassword(sysUser.getPassword() != null ? passwordEncoder.encode(sysUser.getPassword()) : oldSysUser.getPassword());
+        sysUser.setPassword(!StringUtils.isBlank(sysUser.getPassword()) ? passwordEncoder.encode(sysUser.getPassword()) : oldSysUser.getPassword());
         sysUser.setStatus(sysUser.getStatus() != null ? sysUser.getStatus() : oldSysUser.getStatus());
         sysUser.setSex(sysUser.getSex() != null ? sysUser.getSex() : oldSysUser.getSex());
-
+        baseMapper.updateById(sysUser);
     }
 
     @Override
@@ -127,6 +130,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, SysUser> implements
             log.error(e.getMessage());
             RestResult.responseJson(response, new RestResult<>(417, "注册失败", e.getMessage()));
 
+        }
+    }
+
+    @Override
+    public void doForget(SysUser sysUser, HttpServletResponse response) {
+        SysUser oldSysUser = this.baseMapper.selectOne(new QueryWrapper<SysUser>().eq("email",sysUser.getEmail()));
+        if(Objects.isNull(oldSysUser)){
+            throw new RuntimeException("该邮箱未注册");
+        }else{
+            String password = passwordEncoder.encode(sysUser.getPassword());
+            oldSysUser.setPassword(password);
+            this.baseMapper.updateById(oldSysUser);
+            RestResult.responseJson(response, new RestResult<>(200, "修改密码成功", "请于登录页面登录"));
         }
     }
 

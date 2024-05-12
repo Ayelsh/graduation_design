@@ -14,6 +14,7 @@ import com.ykj.graduation_design.module.login.DTO.LoginDto;
 import com.ykj.graduation_design.module.login.entity.LoginUser;
 import com.ykj.graduation_design.module.login.service.EmailService;
 import com.ykj.graduation_design.module.login.service.UserService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -91,6 +92,9 @@ public class UserController {
     @PostMapping("addUser")
     public void addUser(@RequestBody SysUser sysUser, HttpServletResponse response) {
         try {
+            if(StringUtils.isBlank(sysUser.getPassword())){
+                sysUser.setPassword("123456");
+            }
             if (sysUser.getPassword() != null && !sysUser.getPassword().isEmpty()) {
                 LoginUser loginUser = UserUtils.getCurrentUser();
                 String password = passwordEncoder.encode(sysUser.getPassword());
@@ -121,6 +125,14 @@ public class UserController {
     }
 
 
+    @PutMapping("resetPassword")
+    public void doForget(@RequestBody SysUser sysUser, HttpServletResponse response) {
+        try{
+            userService.doForget(sysUser,response);}
+        catch (Exception e){
+            RestResult.responseJson(response, new RestResult<>(417, "修改失败", e.getMessage()));
+        }
+    }
     @GetMapping("code")
     public void getCode( String email, HttpServletResponse response) {
         log.info(email);

@@ -18,6 +18,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class UserInfo {
 
+
     /**
      * 用户名
      */

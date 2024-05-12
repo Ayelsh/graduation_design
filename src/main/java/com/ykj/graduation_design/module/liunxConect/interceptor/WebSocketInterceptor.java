@@ -26,7 +26,6 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         if (serverHttpRequest instanceof ServletServerHttpRequest) {
 
             ServletServerHttpRequest request = (ServletServerHttpRequest) serverHttpRequest;
-
             LoginUser userDetails =
                     (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             //这个map存在WebSocketSession
