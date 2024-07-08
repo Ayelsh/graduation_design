@@ -11,8 +11,8 @@
 
 ### 关于部署
   * 实测前后端均可以通过宝塔界面进行图形化部署
-  * 部署前请在部署环境安装好JDK17+MySql+maven+Redis+Minio+MongoDB,修改application.yml和application-dev.yml里面的配置为部署环境的配置，通过maven打成Jar包即可在宝塔界面部署
+  * 部署前请在部署环境安装好JDK17+MySql8+maven+Redis+Minio+MongoDB,修改application.yml和application-dev.yml里面的配置为部署环境的配置，通过maven打成Jar包即可在宝塔界面部署
 
 ### 其他
   * 请确保链接的kali-liunx开放了ssh端口,后端的链接模块做了多线程异步处理，可以拓展成链接多台机器，但是前端当时没完成这个功能
-  * 链接liunx的信息写死在前端页面，可以修改成动态的
+  * 链接liunx的信息用变量写死在前端页面，可以拓展修改成动态的
